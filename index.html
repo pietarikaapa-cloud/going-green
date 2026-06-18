@@ -9,20 +9,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Soundstage / cine-HUD palette. Green is EARNED on the meter, never decorative. */
-    --stage:#14110f;        /* warm blacked-out stage */
-    --stage-2:#1c1815;      /* raised surface */
-    --stage-3:#262019;      /* card */
-    --line:#3a3128;         /* hairline / gaffer */
-    --tungsten:#ede6d8;     /* warm key-light text */
-    --dim:#a89a86;          /* meter labels */
-    --dimmer:#776b5b;
-    --key:#f2a65a;          /* warm key light = high impact / wasteful end */
-    --fill:#52b6c4;         /* cool daylight fill = info */
-    --green:#6fcf73;        /* sustainable end of the meter (earned) */
-    --green-deep:#3f9d52;
-    --rec:#e5563f;          /* REC dot */
-    --focus:#7fd4e0;
+    /* Light editorial theme. Green is still earned on the meter. */
+    --stage:#f4efe5;        /* warm paper background */
+    --stage-2:#ffffff;      /* white raised surface */
+    --stage-3:#fcf9f2;      /* card */
+    --line:#e4dccd;         /* light hairline */
+    --tungsten:#2c2620;     /* ink text */
+    --dim:#6e6557;          /* muted text */
+    --dimmer:#9a9080;
+    --key:#cd7a26;          /* amber accent (high-impact end) */
+    --fill:#2c8ea0;         /* teal accent */
+    --green:#3aa256;        /* sustainable end of meter */
+    --green-deep:#2c8a47;
+    --rec:#e5563f;
+    --focus:#2c8ea0;
     --radius:14px;
     --mono:"Space Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
     --disp:"Space Grotesk", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -30,14 +30,15 @@
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
-    background:var(--stage);
+    background:
+      radial-gradient(120% 80% at 50% 0%, #fbf8f1 0%, var(--stage) 60%);
     color:var(--tungsten);
     font-family:var(--disp);
     -webkit-font-smoothing:antialiased;
     overflow:hidden;
   }
   button{font-family:inherit}
-  ::selection{background:var(--key);color:#1a1108}
+  ::selection{background:var(--key);color:#fff}
 
   /* ---------- Viewfinder frame ---------- */
   #app{
@@ -53,15 +54,13 @@
   }
   body.ar #camera{opacity:.55}
   #scrim{
-    position:fixed; inset:0; z-index:1; pointer-events:none;
-    background:
-      radial-gradient(120% 90% at 50% 0%, transparent 30%, rgba(20,17,15,.55) 100%),
-      linear-gradient(rgba(20,17,15,.35), rgba(20,17,15,.35));
+    position:fixed; inset:0; z-index:1; pointer-events:none; background:none;
   }
   body.ar #scrim{background:radial-gradient(140% 100% at 50% 40%, transparent 35%, rgba(20,17,15,.75) 100%)}
   /* viewfinder corner ticks */
-  .ticks{position:fixed; inset:14px; z-index:2; pointer-events:none}
-  .ticks span{position:absolute;width:22px;height:22px;border:2px solid rgba(237,230,216,.35)}
+  .ticks{position:fixed; inset:14px; z-index:2; pointer-events:none; opacity:0}
+  body.ar .ticks{opacity:1}
+  .ticks span{position:absolute;width:22px;height:22px;border:2px solid rgba(237,230,216,.5)}
   .ticks .tl{top:0;left:0;border-right:0;border-bottom:0}
   .ticks .tr{top:0;right:0;border-left:0;border-bottom:0}
   .ticks .bl{bottom:0;left:0;border-right:0;border-top:0}
@@ -69,20 +68,22 @@
 
   .layer{position:relative; z-index:3; display:flex; flex-direction:column; height:100%; min-height:0}
 
-  /* ---------- Top status bar (camera HUD) ---------- */
+  /* ---------- Top status bar ---------- */
   .hud{
     display:flex; align-items:center; gap:12px;
-    padding:14px 18px; font-family:var(--mono); font-size:12px;
+    padding:13px 18px; font-family:var(--mono); font-size:12px;
     letter-spacing:.04em; color:var(--dim);
     border-bottom:1px solid var(--line);
-    background:linear-gradient(rgba(20,17,15,.85), rgba(20,17,15,.4));
-    backdrop-filter:blur(6px);
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(8px);
   }
+  body.ar .hud{background:linear-gradient(rgba(20,17,15,.85), rgba(20,17,15,.4));color:#ede6d8}
+  body.ar .hud .who,body.ar .hud .rec{color:#fff}
   .rec{display:flex;align-items:center;gap:7px;color:var(--tungsten)}
-  .rec b{width:9px;height:9px;border-radius:50%;background:var(--rec);box-shadow:0 0 10px var(--rec);animation:blink 1.6s infinite}
+  .rec b{width:9px;height:9px;border-radius:50%;background:var(--rec);box-shadow:0 0 8px var(--rec);animation:blink 1.6s infinite}
   @keyframes blink{0%,60%{opacity:1}80%,100%{opacity:.25}}
-  .hud .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tungsten)}
-  .hud .prog{color:var(--green)}
+  .hud .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tungsten);font-weight:700}
+  .hud .prog{color:var(--green-deep);font-weight:700}
   .hud .tc{color:var(--dimmer)}
 
   /* ---------- Scroll body ---------- */
@@ -101,6 +102,21 @@
     font-family:var(--mono);font-size:12px;color:var(--green);
     border:1px solid var(--green-deep);border-radius:999px;padding:5px 11px;letter-spacing:.12em;
   }
+  /* home hero */
+  .hero{position:relative;border-radius:18px;overflow:hidden;padding:26px 24px 24px;margin-bottom:18px;
+    background:
+      radial-gradient(120% 140% at 90% -25%, rgba(44,142,160,.18), transparent 55%),
+      radial-gradient(120% 150% at -5% 120%, rgba(58,162,86,.20), transparent 55%),
+      #ffffff;
+    border:1px solid var(--line); box-shadow:0 12px 30px -18px rgba(60,50,35,.45)}
+  .hero .gels{display:flex;gap:6px;margin-bottom:14px}
+  .hero .gels i{width:28px;height:9px;border-radius:3px}
+  .hero h1{font-size:clamp(34px,8.5vw,52px);margin:.1em 0 .18em;color:var(--tungsten)}
+  .hero .tagline{color:var(--dim);font-size:15.5px;line-height:1.55;max-width:52ch;margin:0}
+  .steps{display:flex;gap:10px;margin:2px 0 0;flex-wrap:wrap}
+  .steps .st{flex:1;min-width:150px;background:var(--stage-2);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+  .steps .st .n{font-family:var(--mono);font-size:11px;color:var(--key);letter-spacing:.1em}
+  .steps .st .d{font-size:13px;color:var(--dim);line-height:1.4;margin-top:3px}
   .field{margin:16px 0}
   label.lab{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
   input[type=text]{
@@ -112,53 +128,66 @@
   @media(max-width:430px){.row2{grid-template-columns:1fr}}
 
   .btn{
-    appearance:none;border:1px solid var(--line);background:var(--stage-3);color:var(--tungsten);
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--tungsten);
     border-radius:11px;padding:14px 18px;font-size:15px;font-weight:600;cursor:pointer;
-    display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:transform .08s ease,border-color .2s,background .2s;
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:transform .08s ease,border-color .2s,background .2s,box-shadow .2s;
+    box-shadow:0 1px 3px rgba(60,50,35,.10);
   }
-  .btn:hover{border-color:var(--dimmer)}
+  .btn:hover{border-color:var(--dimmer);background:#fbf8f1}
   .btn:active{transform:translateY(1px)}
-  .btn.primary{background:linear-gradient(180deg,#2e6f3e,#246034);border-color:#357a47;color:#eafff0}
-  .btn.primary:hover{background:linear-gradient(180deg,#357f47,#28683a)}
-  .btn.key{background:transparent;border-color:var(--key);color:var(--key)}
+  .btn.primary{background:linear-gradient(180deg,#3fb061,#2c9148);border:1px solid #2c8a47;color:#fff;font-weight:700;font-size:16px;
+    box-shadow:0 10px 22px -8px rgba(44,145,72,.6), inset 0 1px 0 rgba(255,255,255,.25)}
+  .btn.primary:hover{background:linear-gradient(180deg,#48bd6b,#308f4d);border-color:#2c8a47}
+  .btn.key{background:rgba(205,122,38,.08);border-color:var(--key);color:var(--key)}
   .btn.block{width:100%}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   .btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 
   /* ---------- Station hub ---------- */
   .toolbar{display:flex;gap:10px;align-items:center;margin:6px 0 18px;flex-wrap:wrap}
   .toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
   .toggle button{background:transparent;border:0;color:var(--dim);padding:9px 16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;cursor:pointer}
-  .toggle button[aria-pressed=true]{background:var(--stage-3);color:var(--tungsten)}
+  .toggle button[aria-pressed=true]{background:var(--tungsten);color:#fff}
   .codejump{margin-left:auto;display:flex;gap:8px;align-items:center}
   .codejump input{width:84px;text-align:center;font-family:var(--mono);background:var(--stage-2);border:1px solid var(--line);color:var(--tungsten);border-radius:9px;padding:9px}
 
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}}
 
-  /* clapperboard-style station card */
+  /* station card */
   .slate{
-    text-align:left;cursor:pointer;border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--stage-3);padding:0;overflow:hidden;transition:border-color .2s,transform .08s;
-    display:flex;flex-direction:column;
+    text-align:left;cursor:pointer;border:1px solid var(--line);border-radius:16px;
+    background:#ffffff;padding:0;overflow:hidden;
+    transition:border-color .2s,transform .12s,box-shadow .2s;
+    display:flex;flex-direction:column;box-shadow:0 6px 18px -10px rgba(60,50,35,.35);
+    position:relative;
   }
-  .slate:hover{border-color:var(--dimmer)}
-  .slate:active{transform:translateY(1px)}
-  .slate .stripe{display:flex;height:14px}
+  .slate::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--ac,#cd7a26)}
+  .slate:hover{border-color:var(--ac,#cd7a26);transform:translateY(-4px);box-shadow:0 18px 32px -14px rgba(60,50,35,.4)}
+  .slate:active{transform:translateY(-1px)}
+  .slate .stripe{display:flex;height:12px;margin-left:5px}
   .slate .stripe i{flex:1}
-  .slate .stripe i:nth-child(odd){background:#0c0a08}
+  .slate .stripe i:nth-child(odd){background:#2c2620}
   .slate .stripe i:nth-child(even){background:#efe7d6}
-  .slate .body{padding:14px 15px 16px}
-  .slate .code{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--key)}
-  .slate h3{margin:6px 0 4px;font-size:17px;font-weight:600;letter-spacing:-.01em}
-  .slate .tag{font-size:12.5px;color:var(--dim);line-height:1.45}
-  .slate .foot{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--dimmer)}
-  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:3px 8px;border-radius:999px;border:1px solid var(--line)}
-  .chip.done{color:var(--green);border-color:var(--green-deep)}
+  .slate .body{padding:18px 18px 18px 20px}
+  .slate .htop{display:flex;align-items:center;gap:13px}
+  .slate .ic{width:54px;height:54px;flex:none;border-radius:13px;display:grid;place-items:center;font-size:28px;
+    background:#f6efe2;border:1px solid var(--line);
+    background:color-mix(in srgb, var(--ac,#cd7a26) 14%, #ffffff);border-color:color-mix(in srgb,var(--ac,#cd7a26) 35%, transparent)}
+  .slate .code{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ac,var(--key))}
+  .slate h3{margin:4px 0 0;font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.12}
+  .slate .tag{font-size:14px;color:var(--dim);line-height:1.5;margin-top:12px}
+  .slate .foot{display:flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--dimmer)}
+  .slate .open{margin-left:auto;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ac,#cd7a26);font-weight:700}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+  .chip.done{color:#fff;background:var(--green-deep);border-color:var(--green-deep);font-weight:700}
   .chip.todo{color:var(--dim)}
 
   /* ---------- Station detail ---------- */
-  .back{background:none;border:0;color:var(--dim);font-family:var(--mono);font-size:12px;letter-spacing:.08em;cursor:pointer;padding:4px 0;margin-bottom:6px}
+  .back{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);color:var(--dim);
+    font-family:var(--mono);font-size:12px;letter-spacing:.05em;cursor:pointer;padding:9px 14px;border-radius:999px;margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(60,50,35,.1);transition:border-color .2s,color .2s,background .2s}
+  .back:hover{border-color:var(--dimmer);color:var(--tungsten);background:#fbf8f1}
   .panel{background:var(--stage-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;margin:14px 0}
   .panel h4{margin:0 0 7px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
   .panel p{margin:0;color:var(--tungsten);line-height:1.55;font-size:15px}
@@ -204,8 +233,9 @@
   .dock{
     position:absolute;left:0;right:0;bottom:0;z-index:5;
     padding:13px 16px calc(13px + env(safe-area-inset-bottom));
-    background:linear-gradient(rgba(20,17,15,.2),rgba(20,17,15,.96) 40%);
-    border-top:1px solid var(--line);backdrop-filter:blur(8px);
+    background:rgba(255,255,255,.94);
+    border-top:1px solid var(--line); backdrop-filter:blur(10px);
+    box-shadow:0 -8px 22px -16px rgba(60,50,35,.4);
     display:flex;gap:11px;align-items:center;
   }
   .dock .grow{flex:1}
@@ -255,6 +285,32 @@
   .opt .pe{flex:none;font-family:var(--mono);font-size:11px;color:var(--dim);align-self:center}
   .verdict{font-size:15px;line-height:1.55;color:var(--tungsten);margin:6px 0}
   .kicker{border-left:3px solid var(--fill);background:var(--stage-2);border:1px solid var(--line);border-left-width:3px;border-radius:11px;padding:14px 15px;margin:14px 0;font-size:14px;line-height:1.55;color:var(--dim)}
+
+  /* avatar select */
+  .avgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin:14px 0}
+  .avcard{cursor:pointer;text-align:center;background:var(--stage-2);border:1px solid var(--line);border-radius:13px;padding:16px 10px;transition:border-color .15s,transform .08s;color:var(--tungsten)}
+  .avcard:hover{border-color:var(--dimmer)} .avcard:active{transform:translateY(1px)}
+  .avcard[aria-pressed=true]{border-color:var(--green-deep);background:rgba(63,157,82,.1)}
+  .avcard .face{width:58px;height:58px;margin:0 auto 9px;border-radius:50%;display:grid;place-items:center;font-size:28px;border:2px solid var(--stage)}
+  .avcard .rn{font-weight:600;font-size:15px} .avcard .rd{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.35}
+
+  /* explorable world */
+  .worldhud{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--dim);margin:2px 2px 8px}
+  .worldhud .sc{color:var(--green);font-weight:700} .worldhud .hint{margin-left:auto;color:var(--dimmer);font-size:11px;text-align:right}
+  .worldwrap{position:relative;margin:2px 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0f12}
+  #gcanvas{display:block;width:100%;touch-action:none}
+
+  /* in-world decision modal */
+  .gmodal{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;background:rgba(8,7,6,.62);backdrop-filter:blur(3px)}
+  .gmodal .sheet{width:100%;max-width:560px;max-height:90vh;overflow-y:auto;background:var(--stage-2);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom));animation:rise .25s ease}
+  @keyframes rise{from{transform:translateY(20px);opacity:.6}to{transform:none;opacity:1}}
+  .gmodal .mh{display:flex;align-items:center;gap:11px;margin:0 0 4px}
+  .gmodal .mh .ic{font-size:26px}
+  .gmodal .mh .cd{font-family:var(--mono);font-size:11px;color:var(--key);letter-spacing:.1em}
+  .gmodal h3{margin:2px 0 6px;font-size:20px;font-weight:600}
+  .gmodal .mq{color:var(--dim);font-size:15px;line-height:1.5;margin:0 0 14px}
+  .gmodal .close{background:none;border:0;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:6px}
+  @media(min-width:560px){.gmodal{align-items:center}.gmodal .sheet{border-radius:18px}}
   .hide{display:none !important}
   @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
 </style>
@@ -288,7 +344,7 @@
    Paste the Google Apps Script Web App URL below to collect every
    student's results into one central Google Sheet. Leave blank to run
    the app in offline mode (students export their own CSV/JSON).        */
-const GOOGLE_ENDPOINT = "https://script.google.com/macros/s/AKfycbws9B3W5z2d1EA0nlH1bvfv1I58WPa79SL55nA_SnqEDegrhRVvE1VIWjlRWhA1d7J9/exec";
+const GOOGLE_ENDPOINT = ""; // e.g. "https://script.google.com/macros/s/AKfy.../exec"
 /* --------------------------------------------------------------------- */
 
 /* ---- 2. STATION CONTENT ---------------------------------------------
@@ -543,6 +599,7 @@ function go(route, opt){
 }
 function render(){
   syncHud();
+  if(S.route!=="game") stopWorld();
   if(S.route==="onboard"){ stopAR(); renderOnboard(); }
   else if(S.route==="hub"){ S.view==="ar"?startAR():stopAR(); renderHub(); }
   else if(S.route==="station"){ S.view==="ar"?startAR():stopAR(); renderStation(S.current); }
@@ -552,16 +609,20 @@ function render(){
 
 /* ---- 9. SCREENS ------------------------------------------------------ */
 function renderOnboard(){
-  dock.classList.add("hide");
   const st=S.student||{};
   screen.innerHTML=`
-    <div class="brand">
+    <div class="hero">
+      <div class="gels"><i style="background:#cd7a26"></i><i style="background:#2c8ea0"></i><i style="background:#3aa256"></i><i style="background:#9b8cff"></i></div>
       <span class="eyebrow">Studio sustainability field tool</span>
-      <span class="meter-emblem">● LIVE METER</span>
+      <h1>Going&nbsp;Green</h1>
+      <p class="tagline">Walk a media production studio and uncover where carbon, energy and waste hide — then decide how to address it, including where AI helps and where it doesn't. Your meter swings toward green as you make stronger calls.</p>
     </div>
-    <h1>Going&nbsp;Green</h1>
-    <p class="lede">Walk the studio. At each station you'll see where carbon, energy and waste hide in a real production — and decide how to address it, including where AI helps and where it doesn't. Your meter swings toward green as you make stronger calls.</p>
-    <div class="panel" style="margin-top:22px">
+    <div class="steps">
+      <div class="st"><div class="n">01 · EXPLORE</div><div class="d">Visit eight production stations in list or AR camera view.</div></div>
+      <div class="st"><div class="n">02 · DECIDE</div><div class="d">Complete each task and play the location-shoot game.</div></div>
+      <div class="st"><div class="n">03 · SUBMIT</div><div class="d">Your results flow to the class's central sheet.</div></div>
+    </div>
+    <div class="panel" style="margin-top:18px">
       <h4>Sign in to start your walk</h4>
       <div class="field">
         <label class="lab" for="nm">Your name</label>
@@ -577,39 +638,55 @@ function renderOnboard(){
           <input id="grp" type="text" placeholder="e.g. MA Media B" value="${esc(st.group||"")}">
         </div>
       </div>
-      <button class="btn primary block" id="startBtn">Start the studio walk →</button>
-      <p class="small" style="margin-top:12px">${GOOGLE_ENDPOINT?"Results submit to your class's central sheet at the end.":"Offline mode — you'll export your own results file at the end."}</p>
+      <p class="small" style="margin:2px 0 0">${GOOGLE_ENDPOINT?"Results submit to your class's central sheet at the end.":"Offline mode — you'll export your own results file at the end."}</p>
     </div>
     ${setupBlock()}
   `;
-  $("#startBtn").onclick=()=>{
+  const start=()=>{
     const name=$("#nm").value.trim();
     if(!name){ toast("Add your name to start",true); $("#nm").focus(); return; }
     S.student={ name, id:$("#sid").value.trim(), group:$("#grp").value.trim() };
     if(!S.started) S.started=Date.now();
     S.route="hub"; save(); render();
   };
+  dock.classList.remove("hide");
+  dock.innerHTML=`<span class="grow" style="font-family:var(--mono);font-size:12px;color:var(--dim)">Ready when you are</span><button class="btn primary" id="startBtn" style="min-width:200px">Start the studio walk →</button>`;
+  $("#startBtn").onclick=start;
+  $("#grp").onkeydown=e=>{ if(e.key==="Enter") start(); };
 }
 
 function renderHub(){
-  dock.classList.add("hide");
+  const ART={
+    1:{ic:"💡",ac:"#cd7a26"}, 2:{ic:"🎬",ac:"#2c8ea0"}, 3:{ic:"🧱",ac:"#c2603a"},
+    4:{ic:"🚚",ac:"#c2971e"}, 5:{ic:"🔌",ac:"#3f76d6"}, 6:{ic:"🍽️",ac:"#3aa256"},
+    7:{ic:"🖥️",ac:"#6d5ae0"}, 8:{ic:"🤖",ac:"#b25bc4"}
+  };
   const cards=STATIONS.map(s=>{
-    const d=done(s.id), sc=stationScore(s.id);
-    return `<button class="slate" data-st="${s.id}">
+    const d=done(s.id), sc=stationScore(s.id), art=ART[s.id]||{ic:"🎞️",ac:"#f2a65a"};
+    return `<button class="slate" data-st="${s.id}" style="--ac:${art.ac}">
       <div class="stripe">${"<i></i>".repeat(12)}</div>
       <div class="body">
-        <div class="code">${esc(s.code)}</div>
-        <h3>${esc(s.name)}</h3>
+        <div class="htop">
+          <div class="ic">${art.ic}</div>
+          <div style="min-width:0">
+            <div class="code">${esc(s.code)}</div>
+            <h3>${esc(s.name)}</h3>
+          </div>
+        </div>
         <div class="tag">${esc(s.tag)}</div>
         <div class="foot">
           ${d?`<span class="chip done">DONE · ${sc}/100</span>`:`<span class="chip todo">TASK OPEN</span>`}
+          <span class="open">${d?"REVIEW ▸":"OPEN ▸"}</span>
         </div>
       </div>
     </button>`;
   }).join("");
+  const left=STATIONS.length-completedCount();
   screen.innerHTML=`
-    <span class="eyebrow">${esc(S.student.name)} · station select</span>
-    <h2 style="margin-top:8px">Choose a station</h2>
+    <button class="back" id="hubBack">← Back to sign-in</button>
+    <div class="small" style="margin-bottom:2px">Signed in as <b style="color:var(--tungsten)">${esc(S.student.name)}</b>${S.student.group?` · ${esc(S.student.group)}`:""}</div>
+    <h2 style="margin:2px 0 2px">Choose a station</h2>
+    <p class="small" style="margin:0 0 12px">Eight production areas — open each one to assess and improve its sustainability.</p>
     <div class="toolbar">
       <div class="toggle" role="group" aria-label="View mode">
         <button id="vList" aria-pressed="${S.view!=="ar"}">LIST</button>
@@ -620,17 +697,19 @@ function renderHub(){
         <button class="btn" id="codeGo">Go</button>
       </div>
     </div>
-    <p class="small" style="margin:-6px 0 16px">${S.view==="ar"
-      ? "Point your device at a station marker. Tap a card to open its task. (Camera unavailable on some desktops — LIST works everywhere.)"
-      : "Tap a station, or type the number printed on its QR marker in the studio."}</p>
+    <p class="small" style="margin:-2px 0 16px">${S.view==="ar"
+      ? "Point your device at a station marker, then tap a card to open its task. (Camera unavailable on some desktops — LIST works everywhere.)"
+      : "Tap a station to begin, or type the number printed on its QR marker in the studio."}</p>
     <div class="grid">${cards}</div>
-    <button class="btn primary block" id="toSummary" style="margin-top:20px">Review & submit results (${completedCount()}/${STATIONS.length})</button>
   `;
+  $("#hubBack").onclick=()=>{ S.route="onboard"; save(); render(); };
   $("#vList").onclick=()=>{ S.view="list"; save(); render(); };
   $("#vAr").onclick=async()=>{ S.view="ar"; save(); const ok=await startAR(); if(!ok) toast("Camera unavailable — using list view",true); render(); };
   screen.querySelectorAll(".slate").forEach(b=> b.onclick=()=>{ S.route="station"; S.current=+b.dataset.st; save(); render(); });
   const jump=()=>{ const n=+$("#codeIn").value; const s=STATIONS.find(x=>x.id===n); if(s){ S.route="station"; S.current=n; save(); render(); } else toast("No station with that number",true); };
   $("#codeGo").onclick=jump; $("#codeIn").onkeydown=e=>{ if(e.key==="Enter") jump(); };
+  dock.classList.remove("hide");
+  dock.innerHTML=`<span class="grow" style="font-family:var(--mono);font-size:12px;color:var(--dim)">${completedCount()}/${STATIONS.length} done${left?` · ${left} to go`:" · all complete"}</span><button class="btn primary" id="toSummary" style="min-width:180px">Review &amp; submit ▸</button>`;
   $("#toSummary").onclick=()=>{ S.route="summary"; save(); render(); };
 }
 
@@ -692,7 +771,7 @@ function renderStation(id){
   `;
 
   $("#back").onclick=()=>{ S.route="hub"; save(); render(); };
-  const pg=$("#playGame"); if(pg) pg.onclick=()=>{ S.game={ step:0, choices:Array(LOCATION_GAME.markers.length).fill(null), done:false, score:(S.game&&S.game.done?S.game.score:0) }; S.route="game"; save(); render(); };
+  const pg=$("#playGame"); if(pg) pg.onclick=()=>{ S.game={ choices:Array(LOCATION_GAME.markers.length).fill(null), finished:false, done:false, score:(S.game&&S.game.done?S.game.score:0), avatar:(S.game&&S.game.avatar)||null }; S.route="game"; save(); render(); };
 
   function paintMeter(){
     const sc=stationScore(id);
@@ -755,15 +834,45 @@ function compareBars(){
   <p class="small">Indicative teaching units — not audited tCO₂e. The white line marks the studio baseline; get your location bar down to it by minimising every decision.</p>`;
 }
 
+/* avatars the player can take up (production roles) */
+const AVATARS=[
+  {id:"prod", name:"Priya",  role:"Producer",            color:"#f2a65a", face:"🎬"},
+  {id:"dir",  name:"Marco",  role:"Director",            color:"#52b6c4", face:"🎥"},
+  {id:"sus",  name:"Aïsha",  role:"Sustainability lead", color:"#6fcf73", face:"🌱"},
+  {id:"run",  name:"Kai",    role:"Runner",              color:"#c98ad6", face:"🏃"}
+];
+/* where each point of contact physically sits in the virtual island (world 1000x680) */
+const MARK_POS=[
+  {x:255,y:175,icon:"🔭"},{x:215,y:470,icon:"✈️"},{x:360,y:545,icon:"📦"},{x:795,y:300,icon:"⚡"},
+  {x:500,y:330,icon:"🏠"},{x:255,y:360,icon:"🛏️"},{x:700,y:520,icon:"🍽️"},{x:905,y:415,icon:"🌊"},
+  {x:610,y:245,icon:"💡"},{x:770,y:165,icon:"📡"}
+];
+const ISLAND={cx:500,cy:360,rx:432,ry:292};
+const PORTAL={x:825,y:560,icon:"🎬"};            // island → studio
+const STUDIO_PORTAL={x:150,y:560,icon:"🚪"};     // studio → island
+
+let world=null;
+function stopWorld(){
+  if(!world) return;
+  world.alive=false;
+  if(world.raf) cancelAnimationFrame(world.raf);
+  window.removeEventListener("keydown",world.kd); window.removeEventListener("keyup",world.ku);
+  window.removeEventListener("resize",world.rz);
+  if(world.pm) window.removeEventListener("pointermove",world.pm);
+  if(world.pu) window.removeEventListener("pointerup",world.pu);
+  const gm=document.getElementById("gmodal"); if(gm) gm.remove();
+  world=null;
+}
+
 function renderGame(){
-  if(!S.game){ S.game={ step:0, choices:Array(LOCATION_GAME.markers.length).fill(null), done:false, score:0 }; }
+  if(!S.game){ S.game={ choices:Array(LOCATION_GAME.markers.length).fill(null), finished:false, done:false, score:0, avatar:null }; }
   const G=LOCATION_GAME, total=G.markers.length;
 
-  // ----- result screen -----
-  if(S.game.step>=total){
+  // ---------- result ----------
+  if(S.game.finished){
+    stopWorld();
     const score=gameScore(); S.game.score=Math.max(S.game.score||0,score); S.game.done=true; save();
-    const loc=locFootprint();
-    const beatVP = loc<=VP_BASELINE;
+    const loc=locFootprint(), beatVP=loc<=VP_BASELINE;
     const verdict = score>=46 ? "Outstanding — you ran this format at near-minimum impact."
                   : score>=36 ? "Strong. A few decisions still cost more than they needed to."
                   : score>=26 ? "Middling. The big-ticket items (travel, power) are where you lost points."
@@ -784,74 +893,375 @@ function renderGame(){
       <p class="small">Your game score is saved with your station results and submitted to the class sheet.</p>
     `;
     $("#gBack").onclick=()=>{ S.route="station"; S.current=2; save(); render(); };
-    $("#gReplay").onclick=()=>{ S.game={ step:0, choices:Array(total).fill(null), done:false, score:S.game.score }; save(); render(); };
+    $("#gReplay").onclick=()=>{ S.game={ choices:Array(total).fill(null), finished:false, done:false, score:S.game.score, avatar:S.game.avatar }; save(); render(); };
     return;
   }
 
-  // ----- intro screen -----
-  if(S.game.step===0 && S.game.choices.every(c=>c==null)){
-    dock.classList.remove("hide");
-    dock.innerHTML=`<button class="btn" id="gExit">VP station</button><span class="grow"></span><button class="btn primary" id="gStart">Start the walk →</button>`;
+  // ---------- intro + avatar select ----------
+  if(!S.game.avatar){
+    stopWorld();
+    dock.classList.add("hide");
     screen.innerHTML=`
       <button class="back" id="back">← virtual production</button>
-      <span class="eyebrow">Location shoot challenge</span>
+      <span class="eyebrow">Location shoot challenge · virtual world</span>
       <h1 style="font-size:clamp(26px,6vw,40px)">${esc(G.title)}</h1>
-      <div class="gamehero"><p class="premise">${esc(G.premise)}</p>
-        <div class="marker-rail">${G.markers.map(()=>`<i></i>`).join("")}</div>
+      <div class="gamehero"><p class="premise">${esc(G.premise)}</p></div>
+      <h2 style="font-size:18px;margin-top:18px">Choose your role on the unit</h2>
+      <p class="small" style="margin-top:-2px">You'll walk this avatar around the island and step up to each of the 10 points of contact to make the call.</p>
+      <div class="avgrid">
+        ${AVATARS.map(a=>`<button class="avcard" data-av="${a.id}" aria-pressed="false">
+          <div class="face" style="background:${a.color}22;border-color:${a.color}">${a.face}</div>
+          <div class="rn">${esc(a.name)}</div><div class="rd">${esc(a.role)}</div>
+        </button>`).join("")}
       </div>
-      ${compareBars()}
     `;
     $("#back").onclick=()=>{ S.route="station"; S.current=2; save(); render(); };
-    $("#gExit").onclick=()=>{ S.route="station"; S.current=2; save(); render(); };
-    $("#gStart").onclick=()=>{ S.game.started=true; save(); renderMarker(); };
+    screen.querySelectorAll(".avcard").forEach(b=> b.onclick=()=>{
+      S.game.avatar=b.dataset.av; save(); render();
+    });
     return;
   }
-  renderMarker();
+
+  // ---------- the explorable world ----------
+  renderWorld();
 }
 
-function renderMarker(){
-  const G=LOCATION_GAME, total=G.markers.length, i=S.game.step, m=G.markers[i];
-  const chosen=S.game.choices[i];
+function renderWorld(){
+  const G=LOCATION_GAME, av=AVATARS.find(a=>a.id===S.game.avatar)||AVATARS[0];
   dock.classList.remove("hide");
-  const rail=G.markers.map((_,k)=>`<i class="${k<i?'on':k===i?'cur':''}"></i>`).join("");
+  dock.innerHTML=`<button class="btn" id="wExit">Leave</button><button class="btn" id="wCam"></button><span class="grow"></span><button class="btn primary" id="wFinish">Finish ▸</button>`;
   screen.innerHTML=`
-    <button class="back" id="back">← markers</button>
-    <div class="marker-rail" style="margin-bottom:14px">${rail}</div>
-    <span class="eyebrow">${esc(m.code)} · marker ${i+1} of ${total} · score so far ${gameScore()}/50</span>
-    <h1 style="font-size:clamp(24px,5.5vw,34px)">${esc(m.title)}</h1>
-    <p class="lede" style="font-size:16px">${esc(m.q)}</p>
-    <div id="opts" style="margin-top:14px">
-      ${m.opts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="${chosen===k}">
-        <span class="mk"></span>
-        <span class="ot">${esc(o.l)}</span>
-        <span class="pe">${o.p}/5</span>
-      </button>`).join("")}
+    <div class="worldhud">
+      <span>${esc(av.name)} · ${esc(av.role)}</span>
+      <span class="sc" id="wScore">${gameScore()}/50</span>
+      <span class="hint">Drag left ½ = move · right ½ = look · 📹/👁 toggle view</span>
     </div>
-    <div id="fb"></div>
-    ${compareBars()}
+    <div class="worldwrap"><canvas id="gcanvas"></canvas></div>
+    <p class="small" style="margin-top:8px">First-person walk: explore all 10 points of contact, then hit <b>Finish</b>. Head for the 🎬 door to step inside the LED-volume studio and see the same beach done virtually. On a laptop: <b>W/S</b> move, <b>A/D</b> or <b>←/→</b> turn.</p>
   `;
-  $("#back").onclick=()=>{ if(i>0){ S.game.step=i-1; save(); renderMarker(); } else { S.route="station"; S.current=2; save(); render(); } };
+  $("#wExit").onclick=()=>{ stopWorld(); S.route="station"; S.current=2; save(); render(); };
+  $("#wFinish").onclick=()=>{ S.game.finished=true; stopWorld(); save(); render(); };
+  function camLabel(){ $("#wCam").textContent = world.cam==="follow" ? "📹 Follow-cam" : "👁 First-person"; }
+  $("#wCam").onclick=()=>{ if(!world) return; world.cam = world.cam==="follow"?"fp":"follow"; S.game.cam=world.cam; save(); camLabel(); };
 
-  function paintDock(){
-    const picked=S.game.choices[i]!=null;
-    dock.innerHTML=`<button class="btn" id="mBack">${i>0?'← Back':'Markers'}</button><span class="grow"></span>
-      <button class="btn primary" id="mNext" ${picked?'':'disabled'}>${i+1<total?'Next marker →':'See field report →'}</button>`;
-    $("#mBack").onclick=()=>{ if(i>0){ S.game.step=i-1; save(); renderMarker(); } else { S.route="station"; S.current=2; save(); render(); } };
-    $("#mNext").onclick=()=>{ S.game.step=i+1; save(); S.route="game"; render(); };
+  const cv=$("#gcanvas"), ctx=cv.getContext("2d");
+  const FOV=1.18, CULL=FOV/2+0.4, CAMH=42;
+  const player={ x:PORTAL.x-120, y:PORTAL.y-150, a:-Math.PI/2, bob:0, moving:false };
+  // face island centre on spawn
+  player.a=Math.atan2(ISLAND.cy-player.y, ISLAND.cx-player.x);
+  world={ alive:true, paused:false, scene:"island", lock:-1, portalLock:true, allDone:false,
+          t:0, dpr:1, cssW:0, cssH:0, keys:{}, ptr:{}, movePtr:null, hits:[], prompt:null,
+          cam:(S.game.cam==="fp"?"fp":"follow") };
+  camLabel();
+
+  function fit(){
+    const rect=cv.parentElement.getBoundingClientRect();
+    const cssW=Math.max(280, rect.width||320);
+    const cssH=Math.max(320, Math.min(cssW*0.74, (window.innerHeight||640)-230));
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    cv.style.height=cssH+"px";
+    cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+    world.dpr=dpr; world.cssW=cssW; world.cssH=cssH;
+    world.focal=(cssW*0.5)/Math.tan(FOV/2);
   }
-  function showFb(){
-    const c=S.game.choices[i]; if(c==null){ $("#fb").innerHTML=""; return; }
-    const o=m.opts[c];
-    $("#fb").innerHTML=`<div class="feedback"><span class="p">+${o.p}</span>${esc(o.why)}</div>`;
+  fit();
+  world.rz=()=>{ if(world) fit(); };
+  window.addEventListener("resize",world.rz);
+
+  // ---------- scene objects ----------
+  function islandObjects(){
+    const o=[];
+    [[150,250],[850,300],[420,560],[680,150],[180,470],[760,470],[560,560],[330,200],[120,360]]
+      .forEach(p=>o.push({x:p[0],y:p[1],kind:"emoji",glyph:"🌴",h:172}));
+    [[640,440],[300,470]].forEach(p=>o.push({x:p[0],y:p[1],kind:"emoji",glyph:"🪨",h:64}));
+    o.push({x:500,y:330,kind:"emoji",glyph:"🏠",h:214});
+    o.push({x:PORTAL.x,y:PORTAL.y,kind:"portal",glyph:"🎬",label:"VP STUDIO",col:"#52b6c4",h:188});
+    LOCATION_GAME.markers.forEach((m,i)=>o.push({x:MARK_POS[i].x,y:MARK_POS[i].y,kind:"marker",i:i,glyph:MARK_POS[i].icon,label:m.code,h:150}));
+    return o;
   }
-  $("#opts").querySelectorAll(".opt").forEach(b=> b.onclick=()=>{
-    S.game.choices[i]=+b.dataset.k; save();
-    $("#opts").querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed", x===b));
-    showFb(); paintDock();
-    // live-update the comparison bars
-    const bars=screen.querySelector(".vs"); if(bars){ const tmp=document.createElement("div"); tmp.innerHTML=compareBars(); bars.replaceWith(tmp.firstElementChild); }
+  function studioObjects(){
+    const o=[];
+    o.push({x:500,y:110,kind:"ledwall",w:540,h:250});
+    o.push({x:420,y:470,kind:"emoji",glyph:"🎥",h:120});
+    o.push({x:650,y:480,kind:"emoji",glyph:"📦",h:84});
+    o.push({x:500,y:330,kind:"sign",glyph:"📉",label:"BASELINE 22u",col:"#6fcf73",h:150});
+    o.push({x:STUDIO_PORTAL.x,y:STUDIO_PORTAL.y,kind:"portal",glyph:"🚪",label:"BACK TO ISLE",col:"#f2a65a",h:196});
+    return o;
+  }
+
+  function clampScene(p){
+    if(world.scene==="island"){
+      const dx=(p.x-ISLAND.cx)/ISLAND.rx, dy=(p.y-ISLAND.cy)/ISLAND.ry, d=dx*dx+dy*dy;
+      if(d>1){ const f=Math.sqrt(d); p.x=ISLAND.cx+(p.x-ISLAND.cx)/f; p.y=ISLAND.cy+(p.y-ISLAND.cy)/f; }
+    } else { p.x=Math.max(110,Math.min(890,p.x)); p.y=Math.max(190,Math.min(600,p.y)); }
+  }
+  function norm(x){ while(x>Math.PI)x-=2*Math.PI; while(x<-Math.PI)x+=2*Math.PI; return x; }
+
+  // ---------- input ----------
+  function half(clientX){ const r=cv.getBoundingClientRect(); return (clientX-r.left) < world.cssW/2 ? "move":"look"; }
+  cv.addEventListener("pointerdown",e=>{
+    if(world.paused) return;
+    const role=half(e.clientX);
+    world.ptr[e.pointerId]={ role, sx:e.clientX, sy:e.clientY, cx:e.clientX, cy:e.clientY, lastX:e.clientX, moved:false };
+    if(role==="move") world.movePtr=e.pointerId;
+    try{ cv.setPointerCapture(e.pointerId); }catch(_){}
   });
-  showFb(); paintDock();
+  world.pm=e=>{
+    const p=world.ptr[e.pointerId]; if(!p) return;
+    if(Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>8) p.moved=true;
+    p.cx=e.clientX; p.cy=e.clientY;
+    if(p.role==="look"){ player.a=norm(player.a + (e.clientX-p.lastX)*0.0052); p.lastX=e.clientX; }
+  };
+  world.pu=e=>{
+    const p=world.ptr[e.pointerId]; if(!p) return;
+    if(!p.moved){ // tap → examine a signpost under the finger
+      const r=cv.getBoundingClientRect(), hx=e.clientX-r.left, hy=e.clientY-r.top;
+      for(const h of world.hits){ if(h.i!=null && S.game.choices[h.i]==null && hx>=h.x&&hx<=h.x+h.w&&hy>=h.y&&hy<=h.y+h.hh){
+        const d=Math.hypot(player.x-MARK_POS[h.i].x, player.y-MARK_POS[h.i].y); if(d<200){ openMarker(h.i); break; } } }
+    }
+    if(world.movePtr===e.pointerId) world.movePtr=null;
+    delete world.ptr[e.pointerId];
+  };
+  window.addEventListener("pointermove",world.pm);
+  window.addEventListener("pointerup",world.pu);
+  world.kd=e=>{ const k=e.key.toLowerCase();
+    if(["w","s","a","d","arrowup","arrowdown","arrowleft","arrowright","q","e"].includes(k)){ world.keys[k]=true; e.preventDefault(); } };
+  world.ku=e=>{ world.keys[e.key.toLowerCase()]=false; };
+  window.addEventListener("keydown",world.kd); window.addEventListener("keyup",world.ku);
+
+  // ---------- update ----------
+  function update(dt){
+    const k=world.keys, SP=158, TURN=2.3;
+    let fwd=0, strafe=0;
+    if(k["w"]||k["arrowup"])fwd+=1; if(k["s"]||k["arrowdown"])fwd-=1;
+    if(k["arrowleft"]||k["a"]) player.a=norm(player.a-TURN*dt);
+    if(k["arrowright"]||k["d"]) player.a=norm(player.a+TURN*dt);
+    if(k["q"])strafe-=1; if(k["e"])strafe+=1;
+    if(world.movePtr!=null){ const p=world.ptr[world.movePtr]; if(p){
+      fwd += Math.max(-1,Math.min(1,(p.sy-p.cy)/46));
+      strafe += Math.max(-1,Math.min(1,(p.cx-p.sx)/46)); } }
+    const mag=Math.hypot(fwd,strafe);
+    if(mag>0.02){
+      const fx=Math.cos(player.a), fy=Math.sin(player.a), rx=Math.cos(player.a+Math.PI/2), ry=Math.sin(player.a+Math.PI/2);
+      player.x += (fx*fwd + rx*strafe)*SP*dt;
+      player.y += (fy*fwd + ry*strafe)*SP*dt;
+      player.moving=true; player.bob+=dt*7;
+    } else player.moving=false;
+    clampScene(player);
+
+    // portal
+    const portal = world.scene==="island"?PORTAL:STUDIO_PORTAL;
+    const pd=Math.hypot(player.x-portal.x, player.y-portal.y);
+    if(pd<48){ if(!world.portalLock){
+      world.scene = world.scene==="island"?"studio":"island";
+      if(world.scene==="studio"){ player.x=500; player.y=560; }
+      else { player.x=PORTAL.x-120; player.y=PORTAL.y-150; }
+      player.a=Math.atan2((world.scene==="studio"?160:ISLAND.cy)-player.y,(world.scene==="studio"?500:ISLAND.cx)-player.x);
+      world.portalLock=true; world.keys={}; world.movePtr=null;
+      toast(world.scene==="studio"?"Inside the LED-volume studio":"Back on location");
+    }} else world.portalLock=false;
+
+    // nearest undone marker (island), with facing
+    world.prompt=null;
+    if(world.scene==="island" && !world.paused){
+      let best=-1,bestd=1e9;
+      LOCATION_GAME.markers.forEach((m,i)=>{ if(S.game.choices[i]!=null) return;
+        const dx=MARK_POS[i].x-player.x, dy=MARK_POS[i].y-player.y, d=Math.hypot(dx,dy);
+        const ang=Math.abs(norm(Math.atan2(dy,dx)-player.a));
+        if(d<78 && ang<0.7 && d<bestd){ best=i; bestd=d; } });
+      if(world.lock>=0){ const d=Math.hypot(player.x-MARK_POS[world.lock].x, player.y-MARK_POS[world.lock].y); if(d>92) world.lock=-1; }
+      if(best>=0){ world.prompt=LOCATION_GAME.markers[best].code; if(bestd<40 && best!==world.lock) openMarker(best); }
+    }
+    if(!world.allDone && S.game.choices.every(c=>c!=null)){ world.allDone=true; toast("All 10 points logged — hit Finish for your report"); }
+    const sc=$("#wScore"); if(sc) sc.textContent=gameScore()+"/50";
+  }
+
+  // ---------- draw ----------
+  function rr(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+
+  function draw(){
+    const c=ctx, W=world.cssW, H=world.cssH;
+    c.save(); c.scale(world.dpr,world.dpr);
+    const bob=player.moving?Math.sin(player.bob)*2.2:0;
+    const hz=H*0.52+bob;
+    const isle=world.scene==="island";
+
+    // camera: first-person (POV) or follow-cam (trailing the visible avatar)
+    const follow=world.cam==="follow";
+    const fxh=Math.cos(player.a), fyh=Math.sin(player.a), rxh=Math.cos(player.a+Math.PI/2), ryh=Math.sin(player.a+Math.PI/2);
+    const BACK=180, SIDE=22, camA=player.a;
+    const camX=follow? player.x-fxh*BACK+rxh*SIDE : player.x;
+    const camY=follow? player.y-fyh*BACK+ryh*SIDE : player.y;
+    const camH=follow? 74 : CAMH;
+
+    // sky
+    const sky=c.createLinearGradient(0,0,0,hz);
+    if(isle){ sky.addColorStop(0,"#7fc7d6"); sky.addColorStop(1,"#cfe9e4"); }
+    else { sky.addColorStop(0,"#0c0e13"); sky.addColorStop(1,"#1a1e26"); }
+    c.fillStyle=sky; c.fillRect(0,0,W,hz);
+    // sun (island)
+    if(isle){ const sa=norm(-2.2-camA); if(Math.abs(sa)<1.0){ const sx=W/2+Math.tan(sa)*world.focal;
+      c.fillStyle="rgba(255,226,150,.95)"; c.beginPath(); c.arc(sx,hz-H*0.26,H*0.05,0,7); c.fill();
+      c.globalAlpha=.18; c.beginPath(); c.arc(sx,hz-H*0.26,H*0.1,0,7); c.fill(); c.globalAlpha=1; } }
+    // sea strip
+    c.fillStyle=isle?"#2f8aa0":"#11151c"; c.fillRect(0,hz-5,W,6);
+    // ground
+    const gr=c.createLinearGradient(0,hz,0,H);
+    if(isle){ gr.addColorStop(0,"#e3cd9f"); gr.addColorStop(1,"#c8ab73"); }
+    else { gr.addColorStop(0,"#1c2029"); gr.addColorStop(1,"#0e1116"); }
+    c.fillStyle=gr; c.fillRect(0,hz,W,H-hz);
+    if(!isle){ c.strokeStyle="rgba(120,160,200,.10)"; c.lineWidth=1;
+      for(let i=1;i<8;i++){ const yy=hz+(H-hz)*(i/8)*(i/8); c.beginPath(); c.moveTo(0,yy); c.lineTo(W,yy); c.stroke(); } }
+
+    // collect + sort billboards (avatar added in follow-cam)
+    const list=isle?islandObjects():studioObjects();
+    if(follow) list.push({x:player.x,y:player.y,kind:"avatar",h:88});
+    const objs=list.map(o=>{
+      const dx=o.x-camX, dy=o.y-camY, dist=Math.max(1,Math.hypot(dx,dy));
+      const ang=norm(Math.atan2(dy,dx)-camA);
+      return {o,dist,ang};
+    }).filter(p=>Math.abs(p.ang)<CULL).sort((a,b)=>b.dist-a.dist);
+
+    world.hits=[];
+    for(const p of objs){
+      const sx=W/2+Math.tan(p.ang)*world.focal;
+      const baseY=hz+(camH*world.focal)/p.dist;
+      const sh=(p.o.h*world.focal)/p.dist;
+      drawObject(c,p.o,sx,baseY,sh,p.dist);
+    }
+
+    // reticle + prompt
+    c.fillStyle="rgba(237,230,216,.5)"; c.beginPath(); c.arc(W/2,hz+ (H-hz)*0.05,2.5,0,7); c.fill();
+    if(world.prompt){ const t="▶ EXAMINE "+world.prompt; c.font="700 13px ui-monospace,monospace"; const tw=c.measureText(t).width;
+      c.fillStyle="rgba(20,17,15,.82)"; rr(c,W/2-tw/2-12,H-58,tw+24,28,8); c.fill();
+      c.fillStyle="#6fcf73"; c.textAlign="center"; c.textBaseline="middle"; c.fillText(t,W/2,H-44); }
+
+    drawMeter(c); drawMinimap(c);
+    // left move-stick feedback
+    if(world.movePtr!=null){ const pt=world.ptr[world.movePtr]; if(pt){ const r=cv.getBoundingClientRect();
+      const ox=pt.sx-r.left, oy=pt.sy-r.top, kx=pt.cx-r.left, ky=pt.cy-r.top;
+      c.strokeStyle="rgba(237,230,216,.4)"; c.lineWidth=2; c.beginPath(); c.arc(ox,oy,30,0,7); c.stroke();
+      c.fillStyle="rgba(111,207,115,.65)"; c.beginPath();
+      c.arc(ox+Math.max(-30,Math.min(30,kx-ox)),oy+Math.max(-30,Math.min(30,ky-oy)),14,0,7); c.fill(); } }
+    c.restore();
+  }
+
+  function icon(c,glyph,x,y,size){ c.font=size+"px serif"; c.textAlign="center"; c.textBaseline="alphabetic"; c.fillText(glyph,x,y); }
+
+  function drawObject(c,o,sx,baseY,sh,dist){
+    // shadow
+    c.save(); c.globalAlpha=.22; c.fillStyle="#000"; c.beginPath(); c.ellipse(sx,baseY,Math.max(6,sh*0.22),Math.max(3,sh*0.08),0,0,7); c.fill(); c.restore();
+    if(o.kind==="avatar"){
+      const w=sh*0.4, top=baseY-sh*0.88, bobv=player.moving?Math.sin(player.bob)*sh*0.03:0;
+      const swing=player.moving?Math.sin(player.bob)*w*0.22:0, lw=w*0.32, lh=sh*0.4;
+      c.fillStyle="#2c2620";
+      rr(c,sx-lw-w*0.04+swing, baseY-lh, lw, lh, lw*0.35); c.fill();
+      rr(c,sx+w*0.04-swing, baseY-lh, lw, lh, lw*0.35); c.fill();
+      c.fillStyle=av.color; rr(c,sx-w/2,top+bobv,w,sh*0.5,w*0.3); c.fill();           // back of body
+      c.fillStyle="rgba(0,0,0,.16)"; rr(c,sx-w*0.24,top+sh*0.12+bobv,w*0.48,sh*0.26,5); c.fill(); // pack
+      c.fillStyle="#e8c39a"; c.beginPath(); c.arc(sx,top-sh*0.02+bobv,w*0.33,0,7); c.fill(); // head
+      c.fillStyle="#3a2c1d"; c.beginPath(); c.arc(sx,top-sh*0.05+bobv,w*0.35,Math.PI*0.85,Math.PI*2.15); c.fill(); // hair
+      return;
+    }
+    if(o.kind==="emoji"){ icon(c,o.glyph,sx,baseY,Math.max(10,sh)); return; }
+    if(o.kind==="ledwall"){ const w=(o.w*world.focal)/dist, x=sx-w/2, y=baseY-sh, h=sh;
+      const g=c.createLinearGradient(0,y,0,y+h*0.82); g.addColorStop(0,"#6fd0e0"); g.addColorStop(.6,"#bfe6c8"); g.addColorStop(1,"#e9d4a8");
+      c.fillStyle=g; rr(c,x,y,w,h*0.82,6); c.fill();
+      c.fillStyle="#ffd98a"; c.beginPath(); c.arc(sx,y+h*0.3,Math.max(5,w*0.05),0,7); c.fill();
+      c.fillStyle="#0e1116"; c.fillRect(x,y+h*0.82,w,h*0.18);
+      c.strokeStyle="#2a2f3a"; c.lineWidth=Math.max(2,w*0.012); rr(c,x,y,w,h*0.82,6); c.stroke();
+      c.fillStyle="rgba(20,17,15,.7)"; c.font="700 "+Math.max(8,sh*0.06)+"px ui-monospace,monospace"; c.textAlign="center"; c.textBaseline="middle";
+      c.fillStyle="#1a2230"; c.fillText("VIRTUAL BEACH · LED VOLUME",sx,y+h*0.9); return; }
+    // marker signpost / sign / portal: post + panel
+    const done=o.kind==="marker" && S.game.choices[o.i]!=null;
+    const col=done?"#6fcf73":(o.col||"#f2d27a");
+    const postW=Math.max(2,sh*0.05), panelW=Math.max(28,sh*0.62), panelH=Math.max(20,sh*0.34);
+    const postTop=baseY-sh*0.55;
+    c.fillStyle="#6b563c"; c.fillRect(sx-postW/2,postTop,postW,baseY-postTop);
+    const px=sx-panelW/2, py=postTop-panelH*0.72;
+    c.fillStyle="rgba(20,17,15,.78)"; rr(c,px,py,panelW,panelH,7); c.fill();
+    c.strokeStyle=col; c.lineWidth=Math.max(1.5,sh*0.018); rr(c,px,py,panelW,panelH,7); c.stroke();
+    icon(c,done?"✅":o.glyph,sx,py+panelH*0.62,Math.max(12,panelH*0.5));
+    c.fillStyle=col; c.font="700 "+Math.max(7,panelH*0.2)+"px ui-monospace,monospace"; c.textAlign="center"; c.textBaseline="alphabetic";
+    c.fillText(o.label,sx,py+panelH-4);
+    if(o.kind==="marker"){ world.hits.push({x:px,y:py,w:panelW,hh:panelH+(baseY-postTop),i:o.i}); }
+    if(o.kind==="portal"){ c.globalAlpha=.5; c.fillStyle=col; rr(c,px-3,py-3,panelW+6,panelH+6,9); c.globalAlpha=1; }
+  }
+
+  function drawMeter(c){
+    const loc=locFootprint(), w=150, x=12, y=12;
+    c.save();
+    c.fillStyle="rgba(20,17,15,.78)"; rr(c,x,y,w+16,52,9); c.fill();
+    c.strokeStyle="#3a3128"; c.lineWidth=1; c.stroke();
+    c.fillStyle="#a89a86"; c.font="700 9px ui-monospace,monospace"; c.textAlign="left"; c.textBaseline="alphabetic";
+    c.fillText("LOCATION "+loc+"u",x+8,y+15);
+    const bx=x+8,bw=w;
+    c.fillStyle="#0c0a08"; rr(c,bx,y+19,bw,8,4); c.fill();
+    const grd=c.createLinearGradient(bx,0,bx+bw,0); grd.addColorStop(0,"#6fcf73"); grd.addColorStop(.55,"#d9c25a"); grd.addColorStop(1,"#f2a65a");
+    c.fillStyle=grd; rr(c,bx,y+19,Math.max(4,bw*loc/LOC_MAX),8,4); c.fill();
+    const vpx=bx+bw*VP_BASELINE/LOC_MAX; c.fillStyle="#ede6d8"; c.fillRect(vpx-1,y+17,2,12);
+    c.fillStyle="#52b6c4"; c.font="700 9px ui-monospace,monospace"; c.fillText("STUDIO BASELINE "+VP_BASELINE+"u",x+8,y+44);
+    c.restore();
+  }
+  function drawMinimap(c){
+    if(world.scene!=="island") return;
+    const W=world.cssW, S0=Math.min(118,W*0.32), x=W-S0-12, y=12, pad=10;
+    c.save();
+    c.fillStyle="rgba(20,17,15,.72)"; rr(c,x,y,S0,S0,10); c.fill(); c.strokeStyle="#3a3128"; c.lineWidth=1; c.stroke();
+    const mx=v=>x+pad+(v/1000)*(S0-2*pad), my=v=>y+pad+(v/680)*(S0-2*pad);
+    c.strokeStyle="rgba(159,191,106,.6)"; c.lineWidth=1.5; c.beginPath();
+    c.ellipse(mx(ISLAND.cx),my(ISLAND.cy),(ISLAND.rx/1000)*(S0-2*pad),(ISLAND.ry/680)*(S0-2*pad),0,0,7); c.stroke();
+    MARK_POS.forEach((p,i)=>{ c.fillStyle=S.game.choices[i]!=null?"#6fcf73":"#f2d27a"; c.beginPath(); c.arc(mx(p.x),my(p.y),2.4,0,7); c.fill(); });
+    c.fillStyle="#52b6c4"; c.beginPath(); c.arc(mx(PORTAL.x),my(PORTAL.y),2.6,0,7); c.fill();
+    // player triangle
+    const px=mx(player.x), py=my(player.y), a=player.a;
+    c.fillStyle="#ede6d8"; c.beginPath();
+    c.moveTo(px+Math.cos(a)*6,py+Math.sin(a)*6);
+    c.lineTo(px+Math.cos(a+2.5)*4,py+Math.sin(a+2.5)*4);
+    c.lineTo(px+Math.cos(a-2.5)*4,py+Math.sin(a-2.5)*4);
+    c.closePath(); c.fill();
+    c.restore();
+  }
+
+  // ---------- loop ----------
+  let last=performance.now();
+  function loop(now){
+    if(!world||!world.alive) return;
+    const dt=Math.min(0.05,(now-last)/1000); last=now; world.t+=dt;
+    if(!world.paused) update(dt);
+    draw();
+    world.raf=requestAnimationFrame(loop);
+  }
+  world.raf=requestAnimationFrame(loop);
+}
+/* in-world decision modal for a point of contact */
+function openMarker(i){
+  if(!world) return;
+  world.paused=true; world.lock=i; world.keys={}; world.movePtr=null; world.ptr={};
+  const m=LOCATION_GAME.markers[i], pos=MARK_POS[i];
+  const host=document.getElementById("app");
+  const wrap=document.createElement("div"); wrap.className="gmodal"; wrap.id="gmodal";
+  wrap.innerHTML=`<div class="sheet">
+    <div class="mh"><span class="ic">${pos.icon}</span><div><div class="cd">${esc(m.code)} · POINT OF CONTACT ${i+1}/10</div></div></div>
+    <h3>${esc(m.title)}</h3>
+    <p class="mq">${esc(m.q)}</p>
+    <div id="mopts">${m.opts.map((o,k)=>`<button class="opt" data-k="${k}">
+      <span class="mk"></span><span class="ot">${esc(o.l)}</span><span class="pe">${o.p}/5</span></button>`).join("")}</div>
+    <div id="mfb"></div>
+    <button class="close" id="mClose">Decide later — keep exploring</button>
+  </div>`;
+  host.appendChild(wrap);
+  const finish=()=>{ wrap.remove(); world.paused=false; };
+  $("#mClose",wrap).onclick=finish;
+  wrap.querySelectorAll(".opt").forEach(b=> b.onclick=()=>{
+    const k=+b.dataset.k, o=m.opts[k];
+    S.game.choices[i]=k; save();
+    wrap.querySelectorAll(".opt").forEach(x=>{ x.setAttribute("aria-pressed", x===b); x.disabled=true; });
+    $("#mfb",wrap).innerHTML=`<div class="feedback"><span class="p">+${o.p}</span>${esc(o.why)}</div>
+      <button class="btn primary block" id="mGo" style="margin-top:12px">Continue exploring →</button>`;
+    $("#mGo",wrap).onclick=finish;
+    $("#mClose",wrap).style.display="none";
+  });
 }
 
 
