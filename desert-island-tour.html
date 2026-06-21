@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>The Desert Island Film Shoot · 360° tour</title>
+<style>
+  :root{ --green:#2f9148; --dark:#16201a; --line:rgba(255,255,255,.18); --mono:ui-monospace,Menlo,Consolas,monospace; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;overflow:hidden}
+  #view{position:fixed;inset:0;touch-action:none}
+  #view canvas{display:block}
+  #load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0c130f;z-index:40;font-family:var(--mono);font-size:13px;letter-spacing:1px;color:#9fb8a8}
+  #fade{position:fixed;inset:0;background:#0c130f;z-index:8;opacity:0;pointer-events:none;transition:opacity .35s}
+  /* top bar */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:12;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(#000a,transparent);pointer-events:none}
+  .brand{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;color:#cfe8d8;background:rgba(8,16,11,.5);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .prog{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:rgba(8,16,11,.5);border:1px solid var(--line);border-radius:999px;padding:6px 12px;pointer-events:none}
+  /* bottom bar */
+  .botbar{position:fixed;left:0;right:0;bottom:0;z-index:12;display:flex;gap:8px;align-items:center;padding:12px;background:linear-gradient(transparent,#000b);pointer-events:none}
+  .botbar>*{pointer-events:auto}
+  .loc{flex:1;min-width:0}
+  .loc .c{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;color:#bfe6cf}
+  .loc .n{font-size:18px;font-weight:800;line-height:1.1;text-shadow:0 1px 4px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .btn{border:0;border-radius:11px;font-weight:800;font-size:14px;padding:11px 15px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .btn.key{background:var(--green);color:#fff}
+  .btn.ghost{background:rgba(12,20,15,.66);color:#fff;border:1px solid var(--line)}
+  .gyro{position:fixed;right:12px;top:46px;z-index:12;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:rgba(8,16,11,.55);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer}
+  .hintline{position:fixed;left:0;right:0;bottom:74px;z-index:11;text-align:center;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);pointer-events:none}
+  /* hotspot */
+  #hot{position:fixed;z-index:10;transform:translate(-50%,-50%);cursor:pointer;display:none}
+  #hot .ring{width:50px;height:50px;border-radius:50%;border:2px solid #fff;background:rgba(47,145,72,.5);display:flex;align-items:center;justify-content:center;animation:pulse 1.8s infinite}
+  #hot .ring b{font-size:22px;line-height:1}
+  #hot.done .ring{background:rgba(40,120,70,.5)}
+  #hot .lab{margin-top:6px;text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;color:#fff;text-shadow:0 1px 3px #000;white-space:nowrap}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(47,145,72,.4)}50%{box-shadow:0 0 0 13px rgba(47,145,72,.06)}}
+  /* sheets (menu + panel + summary) */
+  .scrim{position:fixed;inset:0;z-index:18;background:rgba(6,12,9,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .menu{position:fixed;z-index:20;left:0;right:0;bottom:0;max-height:78%;background:#fbfcfb;color:var(--dark);border-radius:18px 18px 0 0;transform:translateY(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow:auto}
+  .menu.show{transform:none}
+  .mh{position:sticky;top:0;background:#fbfcfb;display:flex;justify-content:space-between;align-items:center;padding:15px 18px 10px;border-bottom:1px solid #e7ece9;font-weight:800}
+  .mh button{border:0;background:#eef2ef;border-radius:9px;width:34px;height:34px;font-size:16px;cursor:pointer;color:#46586a}
+  .mitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:13px 18px;cursor:pointer;border-bottom:1px solid #f1f4f2;font-size:15px;color:var(--dark)}
+  .mitem:hover{background:#f3f7f4}
+  .mitem .ic{width:30px;text-align:center;font-size:18px}
+  .mitem .mt{flex:1}
+  .mitem .mt small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:#7a8a80}
+  .mitem .ck{font-family:var(--mono);font-size:11px;font-weight:700;color:#2d6a4f}
+  .mitem .ck.todo{color:#b08a3a}
+  .mitem.here{background:#eef7f0}
+  .panel{position:fixed;z-index:20;right:0;top:0;bottom:0;width:min(430px,94%);background:#fbfcfb;color:var(--dark);box-shadow:-14px 0 40px rgba(0,0,0,.4);transform:translateX(102%);transition:transform .32s cubic-bezier(.2,.8,.2,1);overflow:auto}
+  .panel.show{transform:none}
+  .ph{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px 8px}
+  .ph .code{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--green);font-weight:700}
+  .ph h2{margin:3px 0 0;font-size:21px}
+  .ph .x{border:0;background:#eef2ef;border-radius:9px;width:34px;height:34px;font-size:17px;cursor:pointer;color:#46586a;flex:0 0 auto}
+  .pbody{padding:0 18px 24px}
+  .impact{background:#f0f5f1;border:1px solid #e2ece5;border-radius:12px;padding:12px 13px;font-size:13.5px;line-height:1.5;color:#33433a}
+  .q{font-weight:700;margin:16px 0 9px;font-size:15px}
+  .opt{display:block;width:100%;text-align:left;border:1.5px solid #e0e6e2;background:#fff;border-radius:12px;padding:12px 13px;margin-bottom:9px;cursor:pointer;font-size:14px;line-height:1.4;transition:border-color .15s,background .15s;color:var(--dark)}
+  .opt:hover{border-color:#bcd3c4}
+  .opt.sel{border-color:var(--green);background:#eef7f0}
+  .opt .ai{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.6px;color:#7a5cd0;background:#efe9fb;border-radius:999px;padding:2px 7px;margin-left:6px}
+  .meterwrap{margin-top:14px}
+  .meterwrap .lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:#5b6b61;margin-bottom:5px}
+  .meter{height:14px;border-radius:999px;background:#e8ece9;overflow:hidden}
+  .meter i{display:block;height:100%;width:0;border-radius:999px;transition:width .5s,background .5s}
+  .result{margin-top:12px;font-size:13.5px;line-height:1.5;color:#33433a;min-height:1em}
+  .pnav{display:flex;gap:8px;margin-top:18px}
+  .pnav .btn{flex:1;text-align:center}
+  /* summary */
+  .summary{position:fixed;inset:0;z-index:30;background:#0c130f;display:none;align-items:center;justify-content:center;padding:24px}
+  .summary.show{display:flex}
+  .scard{max-width:440px;width:100%;background:#fff;color:var(--dark);border-radius:18px;padding:26px 22px;text-align:center}
+  .scard h2{margin:0 0 4px;font-size:24px}
+  .scard .big{font-size:54px;font-weight:800;color:var(--green);line-height:1.1;margin:10px 0 2px}
+  .scard p{font-size:14px;line-height:1.55;color:#445}
+</style>
+</head>
+<body>
+  <div id="load">loading the island…</div>
+  <div id="view"></div>
+  <div id="fade"></div>
+
+  <div class="topbar"><span class="brand">THE DESERT ISLAND FILM SHOOT · 360° TOUR</span><span class="prog" id="prog">0 / 10 assessed</span></div>
+  <button class="gyro" id="gyro">Use motion</button>
+  <div class="hintline">drag to look around · tap the marker, or “Assess”, to make the call</div>
+
+  <div id="hot"><div class="ring"><b>⚑</b></div><div class="lab">tap to assess</div></div>
+
+  <div class="botbar">
+    <div class="loc"><div class="c" id="lcode">SET</div><div class="n" id="lname">—</div></div>
+    <button class="btn ghost" id="menuBtn">◎ Locations</button>
+    <button class="btn key" id="assessBtn">Assess ▸</button>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div class="menu" id="menu">
+    <div class="mh"><span>Travel to a location</span><button id="menuX">✕</button></div>
+    <div id="mlist"></div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="ph"><div><div class="code" id="pcode">SET</div><h2 id="ptitle">—</h2></div><button class="x" id="panelX">✕</button></div>
+    <div class="pbody">
+      <div class="impact" id="pimpact"></div>
+      <div class="q" id="pq"></div>
+      <div id="opts"></div>
+      <div class="meterwrap"><div class="lab"><span>Location footprint</span><span id="mval">—</span></div><div class="meter"><i id="mfill"></i></div></div>
+      <div class="result" id="result"></div>
+      <div class="pnav"><button class="btn ghost" id="prev">‹ Prev</button><button class="btn ghost" id="next">Next ›</button></div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"><div class="scard">
+    <h2>That's a wrap!</h2>
+    <div class="big" id="sscore">—</div>
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:1px;color:#7a8a80;margin-bottom:10px">SUSTAINABILITY SCORE</div>
+    <p id="smsg"></p>
+    <div style="margin-top:16px"><button class="btn key" id="sclose" style="width:100%">Explore the island again</button></div>
+  </div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ---- tour data ----
+const NODES = [
+ { slug:"jetty", name:"Jetty — arrivals", code:"SET · ACCESS & TRANSPORT", icon:"⛴️", lon:90, hot:{lon:90,lat:-4},
+   impact:"Getting people and kit to a remote island is almost always the single biggest source of emissions — flights, freight and boat runs dwarf everything on set.",
+   q:"How do you move cast, crew and kit to the island?",
+   opts:[
+    {t:"Daily speedboat runs, each department travelling separately",fp:100,r:"Maximum convenience, maximum fuel — lots of half-empty trips add up fast."},
+    {t:"Scheduled electric shuttle, consolidated loads, fewer trips",fp:40,r:"Shared, planned crossings on clean power cut the dominant impact hard."},
+    {t:"Smaller unit on island, the rest collaborating remotely",fp:28,r:"The lowest-impact move is simply moving fewer people and less kit."},
+    {t:"AI-optimised manifests & scheduling to fill every trip",fp:34,ai:true,r:"Used well, AI packs loads and routes efficiently — its compute cost is trivial beside a saved boat run. Pair it with real consolidation."}
+   ]},
+ { slug:"cargo", name:"Cargo — kit staging", code:"SET · EQUIPMENT & FREIGHT", icon:"📦", lon:95, hot:{lon:95,lat:-8},
+   impact:"Over-shipping 'just in case' kit means heavier freight, more flight cases and single-use packing — emissions before a frame is shot.",
+   q:"How do you handle equipment and freight?",
+   opts:[
+    {t:"Ship everything you might need, packed in single-use foam",fp:100,r:"The classic over-pack — weight you fly out is weight you pay for in carbon."},
+    {t:"Tight kit list, hire locally where possible, reusable cases",fp:30,r:"Right-sizing and local hire avoid the freight in the first place."},
+    {t:"Consolidated reusable cases shared between departments",fp:42,r:"Fewer, fuller, reusable cases beats many single-purpose ones."},
+    {t:"AI kit-list optimisation from the shoot schedule",fp:36,ai:true,r:"AI can right-size the list from the schedule — a tool to cut freight, not a substitute for leaving kit at home."}
+   ]},
+ { slug:"power", name:"Power compound", code:"SET · POWER", icon:"⚡", lon:80, hot:{lon:80,lat:-6},
+   impact:"On a remote island, generators are typically the second-largest emitter after travel. Diesel sets often run 24/7 and are heavily oversized 'just in case'.",
+   q:"How do you power the shoot?",
+   opts:[
+    {t:"Bank of diesel generators, always on",fp:100,r:"Bulletproof and the worst case — oversized diesel idling burns fuel even at low load."},
+    {t:"Right-sized hybrid generator + battery, load-managed",fp:50,r:"Batteries cover base load and peaks; the generator only runs to recharge."},
+    {t:"Solar + battery array, HVO/grid backup for the gaps",fp:20,r:"The strongest call where sun and space allow — most days run clean."},
+    {t:"AI-scheduled power: forecast load, auto-switch, sleep idle kit",fp:32,ai:true,r:"AI trims waste diesel can't see, but it's the tool not the win — its compute is tiny beside the litres saved."}
+   ]},
+ { slug:"crew", name:"Crew camp", code:"SET · ACCOMMODATION", icon:"⛺", lon:90, hot:{lon:90,lat:-6},
+   impact:"Living on site means energy, water and waste for dozens of people around the clock — often on diesel and bottled water.",
+   q:"How do you house and support the crew?",
+   opts:[
+    {t:"Diesel-powered cabins, bottled water, mixed waste to landfill",fp:100,r:"Comfortable and carbon-heavy — bottled water and landfill waste pile up."},
+    {t:"Eco-tents, solar, refill stations, sorted recycling & compost",fp:30,r:"Low-impact living: clean power, no bottled water, waste designed out."},
+    {t:"House off-island and commute crew in daily",fp:62,r:"Cleaner camp, but the daily transport can quietly undo the saving."},
+    {t:"Smart metering to cut standby and right-size supply",fp:44,ai:true,r:"Monitoring trims standby waste — a useful nudge, not a replacement for clean power and good design."}
+   ]},
+ { slug:"catering", name:"Catering", code:"SET · FIELD KITCHEN", icon:"🍽️", lon:90, hot:{lon:90,lat:-8},
+   impact:"Catering's footprint is food miles, meat, single-use serviceware and food waste — multiplied by every meal for a big unit.",
+   q:"How do you feed the unit?",
+   opts:[
+    {t:"Flown-in, meat-heavy menu on disposables",fp:100,r:"Air-freighted meat and single-use plates are a catering worst case."},
+    {t:"Local, plant-forward menu, reusables, compost",fp:24,r:"Local and plant-forward with reusables is the biggest easy win on set."},
+    {t:"Mostly local with some imported favourites",fp:52,r:"A solid middle path — the imports and any meat are what move the needle."},
+    {t:"AI demand forecasting to cut over-catering & food waste",fp:36,ai:true,r:"Forecasting portions cuts the food waste that quietly dominates — best paired with a local menu."}
+   ]},
+ { slug:"villa", name:"Villa set", code:"SET · THE BUILD", icon:"🏠", lon:95, hot:{lon:95,lat:-6},
+   impact:"Set builds burn through materials and often end in a skip. Virgin timber in, landfill out, is the wasteful default.",
+   q:"How do you build and strike the villa set?",
+   opts:[
+    {t:"Build new from virgin materials, strike straight to landfill",fp:100,r:"Standard practice and deeply wasteful — used once and binned."},
+    {t:"Modular reclaimed timber, designed to dismantle and reuse",fp:28,r:"Design-for-reuse keeps materials in play across productions."},
+    {t:"Rent and redress an existing structure",fp:34,r:"The greenest build is often the one you don't do."},
+    {t:"Extend the set digitally instead of building it all",fp:40,ai:true,r:"Digital set extension avoids physical build — powerful, though render/LED power is a real (smaller) cost to weigh."}
+   ]},
+ { slug:"lighting", name:"Lighting", code:"SET · ON-SET LIGHTING", icon:"💡", lon:90, hot:{lon:90,lat:-2},
+   impact:"Lighting is one of the largest power and heat loads on a set. Big tungsten rigs on diesel gennies waste energy as heat.",
+   q:"How do you light the scene?",
+   opts:[
+    {t:"Tungsten units fed by oversized diesel generators",fp:100,r:"Hot, hungry and fed by diesel — the high-footprint default."},
+    {t:"Daylight-balanced LED + battery carts + reflectors",fp:26,r:"LED draws a fraction of the power; batteries and bounce do the rest."},
+    {t:"Shoot to available daylight wherever the schedule allows",fp:20,r:"Free, beautiful and zero-carbon — plan scenes around the sun."},
+    {t:"AI-assisted relighting in post to reduce on-set rigs",fp:42,ai:true,r:"Fixing light in post can shrink the rig but shifts (smaller) load to compute — use it to reduce, not excuse, hardware."}
+   ]},
+ { slug:"tech", name:"Tech cabin", code:"SET · DATA, DIT & COMMS", icon:"📡", lon:90, hot:{lon:90,lat:-4},
+   impact:"Monitors, edit stations, servers, storage and satellite uplink draw power continuously — and data itself has a footprint.",
+   q:"How do you run data, DIT and comms?",
+   opts:[
+    {t:"Always-on full edit suite and big local servers",fp:100,r:"Convenient and power-hungry around the clock."},
+    {t:"Right-sized DIT on solar + battery, idle kit sleeps",fp:28,r:"Match the kit to the job, power it cleanly, let it sleep when idle."},
+    {t:"Cloud workflow for edit and storage",fp:54,r:"Shifts the footprint off-site rather than removing it — the data centre still burns power."},
+    {t:"AI to cull, transcode and de-dupe footage efficiently",fp:38,ai:true,r:"AI trims storage and transfer waste — a real saving if it cuts data, with a modest compute cost of its own."}
+   ]},
+ { slug:"lookout", name:"Lookout — recce", code:"SET · RECCE & SURVEY", icon:"🔭", lon:88, hot:{lon:88,lat:-6},
+   impact:"Recces and surveys mean extra travel, drone flights and foot traffic through fragile habitat — before the shoot even starts.",
+   q:"How do you scout the location?",
+   opts:[
+    {t:"Fly the whole team out repeatedly to walk every option",fp:100,r:"Lots of long-haul trips for a job that rarely needs the full team."},
+    {t:"One small recce, a drone, and a local fixer's knowledge",fp:30,r:"A lean recce plus local expertise gets the same answers for far less."},
+    {t:"Desktop recce, then a single combined scout trip",fp:26,r:"Do the homework remotely, then make one trip count."},
+    {t:"AI-assisted virtual scouting from maps & existing footage",fp:34,ai:true,r:"Virtual scouting cuts speculative travel — best confirming a single real recce, not replacing all judgement."}
+   ]},
+ { slug:"shoreline", name:"Shoreline — habitat", code:"SET · HABITAT & STEWARDSHIP", icon:"🌊", lon:90, hot:{lon:90,lat:-7},
+   impact:"Sensitive shorelines, tide-pools and nesting areas are easily damaged by kit, foot traffic and lighting at the wrong time.",
+   q:"How do you protect the location while you shoot?",
+   opts:[
+    {t:"Shoot wherever gets the best frame, worry about it later",fp:100,r:"The most damaging option — fragile habitat doesn't recover on a schedule."},
+    {t:"Marked paths, off-limits zones, an ecologist on call",fp:24,r:"Stewardship by design: get the shot without leaving a trace."},
+    {t:"Recreate the sensitive area digitally instead of entering it",fp:34,r:"Keep the cast out of the dunes and add them in later — restraint plus tech."},
+    {t:"Time shoots around wildlife and tides, with low-impact lighting",fp:28,r:"Working with nature's schedule protects it and often looks better."}
+   ]}
+];
+
+const $=id=>document.getElementById(id);
+const view=$('view');
+function vw(){ return view.clientWidth||window.innerWidth||360; }
+function vh(){ return view.clientHeight||window.innerHeight||640; }
+function showErr(m){ const l=$('load'); if(l){ l.style.display='flex'; l.innerHTML='<div style="max-width:320px;text-align:center;line-height:1.55;padding:0 22px">'+m+'</div>'; } }
+
+let scene,camera,renderer,sphere,mat,loader;
+let lon=90,lat=-2,isDown=false,px=0,py=0,lon0=0,lat0=0,auto=true,gyro=false;
+let cur=0; const choices={}; let panelIdx=0;
+
+if(typeof THREE!=='undefined'){ start(); }
+else { const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';
+  s.onload=()=>{ typeof THREE!=='undefined'?start():showErr('Could not load the 3D library.'); };
+  s.onerror=()=>showErr('This tour needs to be <b>online</b> — it loads three.js from a CDN. Host the files together and open over the internet (not pasted into a code block).');
+  document.head.appendChild(s); }
+
+function start(){ try{ init(); buildMenu(); loadNode(0,true); animate(); }catch(e){ showErr('3D failed to start: '+e.message); } }
+
+function init(){
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(72, vw()/vh(), 0.1, 1100);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setClearColor(0x0c130f,1);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  view.appendChild(renderer.domElement); resize();
+  const geo=new THREE.SphereGeometry(500,64,44); geo.scale(-1,1,1);
+  mat=new THREE.MeshBasicMaterial({color:0x223}); sphere=new THREE.Mesh(geo,mat); scene.add(sphere);
+  loader=new THREE.TextureLoader();
+
+  const el=renderer.domElement;
+  el.addEventListener('pointerdown',e=>{ isDown=true; auto=false; px=e.clientX; py=e.clientY; lon0=lon; lat0=lat; el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointermove',e=>{ if(!isDown) return; lon=lon0-(e.clientX-px)*0.16; lat=Math.max(-85,Math.min(85,lat0+(e.clientY-py)*0.16)); });
+  el.addEventListener('pointerup',()=>isDown=false); el.addEventListener('pointercancel',()=>isDown=false);
+
+  $('hot').addEventListener('click',()=>openPanel(cur));
+  $('assessBtn').addEventListener('click',()=>openPanel(cur));
+  $('menuBtn').addEventListener('click',openMenu);
+  $('menuX').addEventListener('click',closeSheets);
+  $('panelX').addEventListener('click',closeSheets);
+  $('scrim').addEventListener('click',closeSheets);
+  $('prev').addEventListener('click',()=>openPanel((panelIdx+NODES.length-1)%NODES.length,true));
+  $('next').addEventListener('click',()=>openPanel((panelIdx+1)%NODES.length,true));
+  $('gyro').addEventListener('click',enableGyro);
+  $('sclose').addEventListener('click',()=>{ $('summary').classList.remove('show'); });
+  window.addEventListener('deviceorientation',onGyro);
+  window.addEventListener('resize',resize);
+}
+
+function loadNode(i, first){
+  cur=i; const n=NODES[i];
+  $('fade').style.opacity=1;
+  const url='p_'+n.slug+'.jpg';
+  loader.load(url, tex=>{
+    if('sRGBEncoding' in THREE) tex.encoding=THREE.sRGBEncoding;
+    const old=mat.map; mat.color && mat.color.set(0xffffff); mat.map=tex; mat.needsUpdate=true; if(old) old.dispose();
+    if(first){ const l=$('load'); if(l) l.style.display='none'; }
+    lon=n.lon; lat=-2; auto=true;
+    $('lcode').textContent=n.code; $('lname').textContent=n.name;
+    const done=choices[n.slug]!=null; const hot=$('hot'); hot.classList.toggle('done',done);
+    hot.querySelector('.lab').textContent = done? 'assessed · reopen' : 'tap to assess';
+    hot.querySelector('b').textContent = done? '✓' : '⚑';
+    setTimeout(()=>{ $('fade').style.opacity=0; }, 60);
+  }, undefined, ()=>{ $('fade').style.opacity=0; showErr('Could not load <b>'+url+'</b>.<br>Make sure the 10 image files sit in the same folder as this page.'); });
+}
+
+function buildMenu(){
+  $('mlist').innerHTML=NODES.map((n,i)=>`<button class="mitem" data-i="${i}"><span class="ic">${n.icon}</span><span class="mt">${n.name}<small>${n.code}</small></span><span class="ck" data-ck="${i}"></span></button>`).join('');
+  $('mlist').querySelectorAll('.mitem').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.i; closeSheets(); if(i!==cur) loadNode(i); }));
+}
+function refreshMenu(){ NODES.forEach((n,i)=>{ const c=document.querySelector(`[data-ck="${i}"]`); if(c){ const d=choices[n.slug]!=null; c.textContent=d?'✓ done':'go ▸'; c.className='ck'+(d?'':' todo'); } 
+  const it=document.querySelector(`.mitem[data-i="${i}"]`); if(it) it.classList.toggle('here',i===cur); }); }
+
+function openMenu(){ refreshMenu(); $('scrim').classList.add('show'); $('menu').classList.add('show'); }
+function closeSheets(){ $('scrim').classList.remove('show'); $('menu').classList.remove('show'); $('panel').classList.remove('show'); }
+
+function openPanel(i, stay){
+  panelIdx=i; const n=NODES[i];
+  if(!stay && i!==cur) loadNode(i);
+  $('pcode').textContent=n.code; $('ptitle').textContent=n.name; $('pimpact').textContent=n.impact; $('pq').textContent=n.q;
+  $('opts').innerHTML=n.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span>${o.t}</span>${o.ai?'<span class="ai">AI LEVER</span>':''}</button>`).join('');
+  $('opts').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>pick(i,+b.dataset.k)));
+  const chosen=choices[n.slug];
+  const fill=$('mfill'), res=$('result');
+  if(chosen!=null){ const k=n.opts.findIndex(o=>o.fp===chosen.fp); paintMeter(chosen.fp); res.innerHTML=chosen.r; if(k>=0) $('opts').children[k].classList.add('sel'); }
+  else { fill.style.width='0'; $('mval').textContent='—'; res.textContent=''; }
+  $('scrim').classList.add('show'); $('panel').classList.add('show');
+}
+function paintMeter(fp){ const fill=$('mfill'); fill.style.width=fp+'%'; fill.style.background=mix([47,145,72],[217,83,79],fp/100); $('mval').textContent=fp+' / 100'; }
+function pick(i,k){
+  const n=NODES[i], o=n.opts[k]; choices[n.slug]={fp:o.fp,r:o.r};
+  $('opts').querySelectorAll('.opt').forEach((b,j)=>b.classList.toggle('sel',j===k));
+  paintMeter(o.fp); $('result').innerHTML=o.r;
+  const done=Object.keys(choices).length; $('prog').textContent=done+' / '+NODES.length+' assessed';
+  if(i===cur){ const hot=$('hot'); hot.classList.add('done'); hot.querySelector('.lab').textContent='assessed · reopen'; hot.querySelector('b').textContent='✓'; }
+  if(done===NODES.length) setTimeout(showSummary,500);
+}
+function mix(a,b,t){ const c=a.map((v,i)=>Math.round(v+(b[i]-v)*t)); return 'rgb('+c[0]+','+c[1]+','+c[2]+')'; }
+
+function showSummary(){
+  let sum=0; NODES.forEach(n=>sum+=choices[n.slug].fp); const avg=sum/NODES.length; const score=Math.round(100-avg);
+  $('sscore').textContent=score+' / 100';
+  let m; if(avg<35) m="Outstanding — a genuinely low-impact production. You consistently tackled the big hitters: travel, power and catering.";
+  else if(avg<55) m="Good work — solid sustainable choices across the shoot, with a few places you could still push harder.";
+  else if(avg<75) m="A mixed shoot — some real wins, but the largest impacts (travel, power, build) still have savings on the table.";
+  else m="High-impact production — the convenient defaults dominated. The biggest gains are in transport, power and catering.";
+  $('smsg').textContent=m;
+  closeSheets(); $('summary').classList.add('show');
+}
+
+function enableGyro(){ const D=window.DeviceOrientationEvent;
+  if(D&&typeof D.requestPermission==='function'){ D.requestPermission().then(s=>{ if(s==='granted') gyroOn(); }).catch(()=>{}); } else gyroOn(); }
+function gyroOn(){ gyro=true; auto=false; $('gyro').textContent='Motion on'; }
+function onGyro(e){ if(!gyro||e.alpha==null) return; lon=-(e.alpha)-90; lat=Math.max(-85,Math.min(85,(e.beta||0)-90)); }
+
+function dirVec(lo,la,r){ const phi=(90-la)*Math.PI/180, th=lo*Math.PI/180; return new THREE.Vector3(r*Math.sin(phi)*Math.cos(th),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(th)); }
+function resize(){ if(!camera) return; const w=vw(),h=vh(); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); }
+
+const _h=new THREE.Vector3();
+function animate(){
+  requestAnimationFrame(animate);
+  if(auto&&!isDown) lon+=0.025;
+  camera.lookAt(dirVec(lon,lat,1).add(camera.position));
+  const n=NODES[cur], hot=$('hot');
+  const sheetsOpen=$('panel').classList.contains('show')||$('menu').classList.contains('show')||$('summary').classList.contains('show');
+  if(!sheetsOpen){
+    _h.copy(dirVec(n.hot.lon,n.hot.lat,100)).project(camera);
+    if(_h.z<1&&_h.x>-1.1&&_h.x<1.1&&_h.y>-1.1&&_h.y<1.1){ hot.style.display='block'; hot.style.left=((_h.x*0.5+0.5)*vw())+'px'; hot.style.top=((-_h.y*0.5+0.5)*vh())+'px'; }
+    else hot.style.display='none';
+  } else hot.style.display='none';
+  renderer.render(scene,camera);
+}
+</script>
+</body>
+</html>
