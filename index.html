@@ -359,7 +359,28 @@
   .gmodal .mh .cd{font-family:var(--mono);font-size:11px;color:var(--key);letter-spacing:.1em}
   .gmodal h3{margin:2px 0 6px;font-size:20px;font-weight:600}
   .gmodal .mq{color:var(--dim);font-size:15px;line-height:1.5;margin:0 0 14px}
-  .gmodal .close{background:none;border:0;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;margin-top:6px}
+  .gmodal .close{position:sticky;bottom:0;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px;border:1.5px solid var(--line);border-radius:12px;background:var(--stage-2);color:#e7efe9;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+  .gmodal .close:hover{border-color:var(--key);color:#fff}
+  .gmodal .xclose{margin-left:auto;flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--dim);font-size:16px;line-height:1;cursor:pointer}
+  .gmodal .xclose:hover{color:#fff;border-color:var(--key)}
+  .panoRoot{position:fixed;inset:0;z-index:60;background:#0c130f}
+  .panoRoot.hide{display:none}
+  #panoCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  .panoTop{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:10px 12px;z-index:2;pointer-events:none}
+  .panoBack{pointer-events:auto;background:rgba(12,20,15,.72);border:1px solid rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .panoName{pointer-events:none;font-family:var(--mono);font-size:11px;letter-spacing:1.4px;color:#fff;background:rgba(8,16,11,.5);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 12px}
+  .panoHint{position:absolute;top:54px;left:0;right:0;text-align:center;z-index:2;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.9);text-shadow:0 1px 3px #000;pointer-events:none}
+  .panoDec{position:absolute;left:0;right:0;bottom:0;z-index:3;max-height:60%;overflow-y:auto;background:var(--stage-2);border-top:1px solid var(--line);border-radius:16px 16px 0 0;padding:15px 16px calc(14px + env(safe-area-inset-bottom));color:var(--tungsten);box-shadow:0 -10px 30px rgba(0,0,0,.32)}
+  .panoDec .pdc{font-family:var(--mono);font-size:11px;color:var(--key);letter-spacing:.1em}
+  .panoDec h3{margin:3px 0 5px;font-size:19px}
+  .panoDec .pdq{color:var(--dim);font-size:14px;line-height:1.45;margin:0 0 12px}
+  .pdOpt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;color:var(--tungsten);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;font-size:14px;line-height:1.35}
+  .pdOpt b{margin-left:auto;font-family:var(--mono);color:var(--dim);font-weight:700}
+  .pdOpt.sel{border-color:var(--key);background:#fff7ef}
+  .pdFb .fb{background:#f0f5f1;border:1px solid #e2ece5;border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.5;color:#33433a;margin-top:4px}
+  .pdFb .fb b{color:#2f9148}
+  .pdLater{position:sticky;bottom:0;display:block;width:100%;margin-top:10px;padding:13px;border:1.5px solid var(--line);border-radius:12px;background:var(--stage-2);color:var(--tungsten);font-weight:700;font-size:14px;cursor:pointer}
+  .pdLater:hover{border-color:var(--key)}
   @media(min-width:560px){.gmodal{align-items:center}.gmodal .sheet{border-radius:18px}}
   .hide{display:none !important}
   @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
@@ -1082,12 +1103,13 @@ function renderWorld(){
   { const gb=$("#guideBtn"); if(gb) gb.onclick=showGuide; }
   { const lmList=$("#lmList"), locMenu=$("#locMenu"), locBtn=$("#locBtn");
     if(lmList){ lmList.innerHTML=MARKER_NAME.map((n,i)=>`<button class="lmItem" data-i="${i}"><span>${i+1}. ${esc(n)}</span><span class="ck" data-ck="${i}"></span></button>`).join("")
+      +`<button class="lmItem door" data-i="hut"><span>⛺ Basic training (free course ↗)</span><span class="ck"></span></button>`
       +`<button class="lmItem door" data-i="door"><span>↪ Studio door (LED stage)</span><span class="ck"></span></button>`;
       const refreshLM=()=>{ MARKER_NAME.forEach((n,i)=>{ const c=lmList.querySelector(`[data-ck="${i}"]`); if(c){ const done=S.game.choices&&S.game.choices[i]!=null; c.textContent=done?"✓ done":"go ▸"; c.className="ck"+(done?"":" todo"); } }); };
       locBtn.onclick=()=>{ refreshLM(); locMenu.classList.toggle("hide"); };
       $("#lmClose").onclick=()=>locMenu.classList.add("hide");
       lmList.onclick=(e)=>{ const b=e.target.closest(".lmItem"); if(!b) return; const v=b.dataset.i; locMenu.classList.add("hide");
-        if(v==="door"){ if(world&&world.goDoor) world.goDoor(); } else if(world&&world.goTo){ world.goTo(+v); toast("Walking to "+MARKER_NAME[+v]); } }; } }
+        if(v==="door"){ if(world&&world.goDoor) world.goDoor(); } else if(v==="hut"){ if(world&&world.goHut){ world.goHut(); toast("Walking to Basic Training"); } } else if(world&&world.goTo){ world.goTo(+v); toast("Walking to "+MARKER_NAME[+v]); } }; } }
   loadThree(()=>{ if(S.route!=="game"||!document.getElementById("w3d")) return; try{ initWorld3D(av); camLabel(); }catch(e){ console.error("3D init failed",e); stopWorld(); if(S.route==="game") renderWorld2D(); } },
             ()=>{ if(S.route!=="game") return; console.warn("Three.js unavailable — using 2D renderer"); renderWorld2D(); });
 }
@@ -1314,18 +1336,23 @@ function initWorld3D(av){
     banner.position.set(0,5.0,az+0.26); islandG.add(banner);                                          // faces the arriving player
     for(let i=-3;i<=3;i++){ const bm=new T.MeshStandardMaterial({color:0xfff0c0,emissive:0xffe08a,emissiveIntensity:0.9}); islandG.add(MB(SPH(0.13),bm,i*0.98,6.7,az)); bulbs.push({mat:bm,ph:i*0.7,sp:2.4+Math.abs(i)*0.25}); } }
 
-  // BASIC-TRAINING HUT — right by the entrance, with a door that opens as you approach
-  const HUT=to3(560,600); let hutDoorPivot=null, hutHit=null; const hutState={open:false,cur:0,ring:null};
+  // BASIC-TRAINING HUT — right beside the entrance path, with a beacon so it's easy to spot
+  const HUT=to3(606,500); let hutDoorPivot=null, hutHit=null; const hutState={open:false,cur:0,ring:null,label:null,orb:null};
   { const g=new T.Group(); g.position.set(HUT.x,0,HUT.z); g.rotation.y=-Math.PI/2;          // door faces the spine
-    const walls=MB(BG(3.6,2.8,3.2),MAT.white,0,1.4,0); g.add(walls); hutHit=walls;
-    g.add(MB(CO(2.95,1.5,4),MAT.wood,0,3.5,0,0,Math.PI/4,0));                                // pyramid roof
-    g.add(MB(BG(1.25,2.15,0.14),MAT.dark,0,1.05,1.55));                                       // dark doorway recess
-    const piv=new T.Group(); piv.position.set(-0.55,1.05,1.63); g.add(piv);                   // hinge at left edge of doorway
-    piv.add(MB(BG(1.1,2.05,0.1),MAT.wood2,0.55,0,0.02)); hutDoorPivot=piv;
-    const sign=new T.Mesh(new T.PlaneGeometry(2.7,1.17), new T.MeshBasicMaterial({map:texTrainSign(),transparent:true,side:T.DoubleSide})); sign.position.set(0,2.55,1.64); g.add(sign);
-    const ring=new T.Mesh(new T.RingGeometry(1.4,1.9,28), new T.MeshBasicMaterial({color:0x2c8ea0,transparent:true,opacity:0.55,side:T.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(0,0.05,2.5); g.add(ring); hutState.ring=ring;
-    g.add(MB(SPH(0.12),new T.MeshStandardMaterial({color:0xfff0c0,emissive:0xffe08a,emissiveIntensity:0.9}),1.05,2.2,1.7));   // lantern
-    islandG.add(g); }
+    const walls=MB(BG(3.8,2.9,3.3),MAT.white,0,1.45,0); g.add(walls); hutHit=walls;
+    g.add(MB(CO(3.1,1.6,4),MAT.wood,0,3.65,0,0,Math.PI/4,0));                                // pyramid roof
+    g.add(MB(BG(1.3,2.2,0.14),MAT.dark,0,1.1,1.6));                                           // dark doorway recess
+    const piv=new T.Group(); piv.position.set(-0.58,1.1,1.68); g.add(piv);                    // hinge at left edge
+    piv.add(MB(BG(1.16,2.1,0.1),MAT.wood2,0.58,0,0.02)); hutDoorPivot=piv;
+    const sign=new T.Mesh(new T.PlaneGeometry(2.9,1.26), new T.MeshBasicMaterial({map:texTrainSign(),transparent:true,side:T.DoubleSide})); sign.position.set(0,2.7,1.69); g.add(sign);
+    const ring=new T.Mesh(new T.RingGeometry(1.6,2.2,30), new T.MeshBasicMaterial({color:0x2c8ea0,transparent:true,opacity:0.6,side:T.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(0,0.05,2.7); g.add(ring); hutState.ring=ring;
+    g.add(MB(SPH(0.13),new T.MeshStandardMaterial({color:0xfff0c0,emissive:0xffe08a,emissiveIntensity:0.9}),1.1,2.3,1.75));   // lantern
+    g.add(MB(CY(0.12,0.14,9,8),MAT.wood2,1.5,4.5,-1.4));                                       // beacon pole
+    const orb=MB(SPH(0.55),new T.MeshStandardMaterial({color:0x49d0e0,emissive:0x37b8cc,emissiveIntensity:1.1}),1.5,9.2,-1.4); g.add(orb); hutState.orb=orb;
+    g.add(MB(CO(0.5,0.8,4),new T.MeshStandardMaterial({color:0x2c8ea0,roughness:0.7}),1.5,8.4,-1.4));
+    islandG.add(g);
+    const lab=new T.Mesh(new T.PlaneGeometry(5.4,2.34), new T.MeshBasicMaterial({map:texTrainSign(),transparent:true,side:T.DoubleSide}));
+    lab.position.set(HUT.x,7.8,HUT.z); islandG.add(lab); hutState.label=lab; }                // floating label (billboards to camera)
   function openTraining(){ hutState.open=true; showHost([{t:'You step inside <b>Basic Training</b>. Continue through to the <b>Global Green Media Network</b> for the essentials of sustainable production.<br><br><a href="https://www.globalgreenmedianetwork.org/" target="_blank" rel="noopener" style="color:#2f9148;font-weight:800;text-decoration:underline">Open the training site ↗</a>'}],{who:"BASIC TRAINING",button:"Back to the island ▸"}); }
 
   // ---- contact points: bespoke set + tall name sign + interact ring ----
@@ -1343,6 +1370,7 @@ function initWorld3D(av){
       bd.add(MB(BG(5.8,0.46,0.36),MAT.wood,0,7.35,-3.3));                                                            // lintel
       bd.add(MB(BG(5.1,6.3,0.12),MAT.dark,0,3.85,-3.34));                                                            // frame
       const photo=new T.Mesh(new T.PlaneGeometry(4.75,5.95), new T.MeshBasicMaterial({map:tx,side:T.DoubleSide})); photo.position.set(0,3.85,-3.26); bd.add(photo);
+      const photoB=new T.Mesh(new T.PlaneGeometry(4.75,5.95), new T.MeshBasicMaterial({map:tx,side:T.DoubleSide})); photoB.position.set(0,3.85,-3.42); bd.add(photoB);   // image on the back too = double-sided gateway
       sign.position.set(0,8.5,-3.18); bd.add(sign);                                                                  // name sign = gateway header
       islandG.add(bd);
     } else { sign.position.set(0,4.4,0); g.add(MB(BG(0.16,4.0,0.16),MAT.wood2,0,2.0,0)); g.add(sign); }
@@ -1487,6 +1515,8 @@ function initWorld3D(av){
     if(hutDoorPivot && world.scene==="island"){ const hd=Math.hypot(player.pos.x-HUT.x,player.pos.z-HUT.z);
       hutState.open=hd<6.5; hutState.cur+=((hutState.open?1.45:0)-hutState.cur)*Math.min(1,dt*4.5); hutDoorPivot.rotation.y=-hutState.cur;
       if(hutState.ring){ const s=1+Math.sin(clock.elapsedTime*3)*0.09; hutState.ring.scale.set(s,s,s); }
+      if(hutState.orb) hutState.orb.material.emissiveIntensity=0.7+0.55*(0.5+0.5*Math.sin(clock.elapsedTime*2.2));
+      if(hutState.label){ const lp=hutState.label.position; hutState.label.lookAt(camera.position.x,lp.y,camera.position.z); }
       if(oPrompt.style.display==="none" && hd<5){ oPrompt.style.display="block"; oPrompt.textContent="▶ TAP THE HUT · Basic training"; } }
     const isle=world.scene==="island"; const pPos=isle?to3(825,560):{x:0,z:16}; const pd=Math.hypot(player.pos.x-pPos.x,player.pos.z-pPos.z);
     if(pd<3.2){ if(!world.portalLock){ world.scene=isle?"studio":"island"; applyScene();
@@ -1510,6 +1540,7 @@ function initWorld3D(av){
   world.refreshMarker=(i)=>{ const mk=markers.find(m=>m.i===i); if(mk){ mk.signMat.map=texSign(MARKER_NAME[i],mk.code,"#"+(MARKER_COL[i]||"f2a65a"),true); mk.signMat.needsUpdate=true; } };
   world.goTo=(i)=>{ if(world.scene!=="island"){ world.scene="island"; applyScene(); } const q=to3(MARK_POS[i].x,MARK_POS[i].y); player.goM=(S.game.choices[i]==null)?i:null; player.tgt=new T.Vector3(q.x,0,q.z); world.paused=false; };
   world.goDoor=()=>{ if(world.scene!=="island") return; const d=to3(825,560); player.goM=null; player.tgt=new T.Vector3(d.x,0,d.z); world.paused=false; };
+  world.goHut=()=>{ if(world.scene!=="island"){ world.scene="island"; applyScene(); } player.goM=null; player.tgt=new T.Vector3(HUT.x-2.6,0,HUT.z+0.4); world.paused=false; };
   if(!S.game.guideSeen) setTimeout(showGuide,350);
 }
 
@@ -1828,21 +1859,24 @@ function openMarker(i){
     showHost([{t:"Here's your first set! Read the <b>impact</b>, weigh the greener option (<b>AI included</b>), then lock in your choice — do this at all ten."}],
       {button:"Got it ▸", onClose:()=>openMarker(i)}); return; }
   world.paused=true; world.lock=i; world.keys={}; world.movePtr=null; world.ptr={};
+  if(world.is3d && openPano(i)) return;
   const m=LOCATION_GAME.markers[i], pos=MARK_POS[i];
   const host=document.getElementById("app");
   const wrap=document.createElement("div"); wrap.className="gmodal"; wrap.id="gmodal";
   wrap.innerHTML=`<div class="sheet">
-    <div class="mh"><span class="ic">${pos.icon}</span><div><div class="cd">${esc(m.code)} · POINT OF CONTACT ${i+1}/10</div></div></div>
+    <div class="mh"><span class="ic">${pos.icon}</span><div><div class="cd">${esc(m.code)} · POINT OF CONTACT ${i+1}/10</div></div><button class="xclose" id="mX" title="Keep exploring" aria-label="Keep exploring">✕</button></div>
     <h3>${esc(m.title)}</h3>
     <p class="mq">${esc(m.q)}</p>
     <div id="mopts">${m.opts.map((o,k)=>`<button class="opt" data-k="${k}">
       <span class="mk"></span><span class="ot">${esc(o.l)}</span><span class="pe">${o.p}/5</span></button>`).join("")}</div>
     <div id="mfb"></div>
-    <button class="close" id="mClose">Decide later — keep exploring</button>
+    <button class="close" id="mClose">↩ Decide later — keep exploring</button>
   </div>`;
   host.appendChild(wrap);
   const finish=()=>{ wrap.remove(); world.paused=false; };
   $("#mClose",wrap).onclick=finish;
+  $("#mX",wrap).onclick=finish;
+  wrap.addEventListener("click",(e)=>{ if(e.target===wrap) finish(); });   // click/tap outside the sheet closes it
   wrap.querySelectorAll(".opt").forEach(b=> b.onclick=()=>{
     const k=+b.dataset.k, o=m.opts[k];
     S.game.choices[i]=k; save();
@@ -1855,6 +1889,70 @@ function openMarker(i){
   });
 }
 
+
+// ---- immersive 360° photo at each location door ----
+const PANO_SLUG=["lookout","jetty","cargo","power","villa","crew","catering","shoreline","lighting","tech"];
+let PANO=null;
+function panoInit(){
+  if(PANO) return PANO;
+  const T=window.THREE;
+  const root=document.createElement("div"); root.id="panoRoot"; root.className="panoRoot hide";
+  root.innerHTML=`<canvas id="panoCanvas"></canvas>
+    <div class="panoTop"><button class="panoBack" id="panoBack">← Back to the island</button><div class="panoName" id="panoName"></div></div>
+    <div class="panoHint" id="panoHint">drag to look around</div>
+    <div class="panoDec" id="panoDec"></div>`;
+  document.body.appendChild(root);
+  const canvas=root.querySelector("#panoCanvas");
+  const r=new T.WebGLRenderer({canvas,antialias:true}); r.setClearColor(0x0c130f,1); r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  if('outputEncoding' in r) r.outputEncoding=T.sRGBEncoding;
+  const sc=new T.Scene(); const cam=new T.PerspectiveCamera(74,1,0.1,1100);
+  const geo=new T.SphereGeometry(500,60,40); geo.scale(-1,1,1);
+  const mat=new T.MeshBasicMaterial({color:0x16201a}); sc.add(new T.Mesh(geo,mat));
+  const st={root,r,sc,cam,mat,loader:new T.TextureLoader(),lon:90,lat:0,down:false,px:0,py:0,lon0:0,lat0:0,raf:0,run:false};
+  st.size=()=>{ const w=root.clientWidth||window.innerWidth, h=root.clientHeight||window.innerHeight; cam.aspect=w/h; cam.updateProjectionMatrix(); r.setSize(w,h); };
+  canvas.addEventListener("pointerdown",e=>{ st.down=true; st.px=e.clientX; st.py=e.clientY; st.lon0=st.lon; st.lat0=st.lat; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener("pointermove",e=>{ if(!st.down) return; st.lon=st.lon0-(e.clientX-st.px)*0.16; st.lat=Math.max(-85,Math.min(85,st.lat0+(e.clientY-st.py)*0.16)); });
+  canvas.addEventListener("pointerup",()=>st.down=false); canvas.addEventListener("pointercancel",()=>st.down=false);
+  window.addEventListener("resize",()=>{ if(st.run) st.size(); });
+  root.querySelector("#panoBack").onclick=hidePano;
+  st.loop=function(){ if(!st.run) return; st.raf=requestAnimationFrame(st.loop);
+    const phi=(90-st.lat)*Math.PI/180, th=st.lon*Math.PI/180;
+    cam.lookAt(new T.Vector3(Math.sin(phi)*Math.cos(th),Math.cos(phi),Math.sin(phi)*Math.sin(th)));
+    r.render(sc,cam); };
+  PANO=st; return st;
+}
+function openPano(i){
+  let st; try{ st=panoInit(); }catch(e){ return false; }
+  const slug=PANO_SLUG[i]||("loc"+i);
+  st.root.classList.remove("hide"); st.size(); st.lon=90; st.lat=0;
+  const hint=st.root.querySelector("#panoHint"); hint.style.display=""; hint.textContent="drag to look around";
+  st.mat.color.set(0xffffff);
+  st.loader.load("p_"+slug+".jpg",
+    tex=>{ if('sRGBEncoding' in window.THREE) tex.encoding=window.THREE.sRGBEncoding; const old=st.mat.map; st.mat.map=tex; st.mat.needsUpdate=true; if(old) old.dispose(); },
+    undefined,
+    ()=>{ const old=st.mat.map; st.mat.map=null; st.mat.color.set(0x16201a); st.mat.needsUpdate=true; if(old) old.dispose(); hint.textContent="(360° photo p_"+slug+".jpg not found — add it next to this page)"; });
+  st.root.querySelector("#panoName").textContent=MARKER_NAME[i]||"";
+  buildPanoDecision(i);
+  if(!st.run){ st.run=true; st.loop(); }
+  return true;
+}
+function hidePano(){ if(!PANO) return; PANO.run=false; if(PANO.raf) cancelAnimationFrame(PANO.raf); PANO.root.classList.add("hide"); if(window.world) world.paused=false; }
+function buildPanoDecision(i){
+  const m=LOCATION_GAME.markers[i], dec=PANO.root.querySelector("#panoDec"), chosen=S.game.choices[i];
+  dec.scrollTop=0;
+  dec.innerHTML=`<div class="pdc">${esc(m.code)} · POINT OF CONTACT ${i+1}/10</div>
+    <h3>${esc(m.title)}</h3><p class="pdq">${esc(m.q)}</p>
+    <div id="pdOpts">${m.opts.map((o,k)=>`<button class="pdOpt${chosen===k?' sel':''}" data-k="${k}"><span>${esc(o.l)}</span><b>${o.p}/5</b></button>`).join("")}</div>
+    <div class="pdFb" id="pdFb"></div>
+    <button class="pdLater" id="pdLater">↩ Decide later — keep exploring</button>`;
+  if(chosen!=null){ const o=m.opts[chosen]; dec.querySelector("#pdFb").innerHTML=`<div class="fb"><b>+${o.p}</b> ${esc(o.why)}</div>`; }
+  dec.querySelector("#pdLater").onclick=hidePano;
+  dec.querySelectorAll(".pdOpt").forEach(b=> b.onclick=()=>{ const k=+b.dataset.k, o=m.opts[k];
+    S.game.choices[i]=k; save(); if(window.world&&world.refreshMarker) world.refreshMarker(i);
+    dec.querySelectorAll(".pdOpt").forEach(x=>x.classList.toggle("sel",x===b));
+    dec.querySelector("#pdFb").innerHTML=`<div class="fb"><b>+${o.p}</b> ${esc(o.why)}</div><button class="btn primary block" id="pdGo" style="margin-top:11px">Continue exploring →</button>`;
+    dec.querySelector("#pdGo").onclick=hidePano; });
+}
 
 function renderSummary(){
   dock.classList.add("hide");
