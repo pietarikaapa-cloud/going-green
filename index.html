@@ -415,19 +415,42 @@
   .signchip:hover{background:rgba(255,255,255,.14)}
   .signchip .dot{width:8px;height:8px;border-radius:50%;background:#6fcf73;box-shadow:0 0 8px #6fcf73}
   .signchip.out .dot{background:#e0a04a;box-shadow:0 0 8px #e0a04a}
-  .choices2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;text-align:left}
-  @media(max-width:560px){.choices2{grid-template-columns:1fr}}
+  .choices2{display:flex;flex-direction:column;gap:12px;margin-top:22px;text-align:left}
   .choiceCard{position:relative;display:flex;flex-direction:column;align-items:flex-start;border-radius:16px;padding:18px 18px 16px;cursor:pointer;
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;
-    transition:transform .1s ease,border-color .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-  .choiceCard:hover{transform:translateY(-2px);background:rgba(255,255,255,.11)}
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;text-align:left;
+    transition:transform .12s ease,border-color .2s,background .2s,box-shadow .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .choiceCard:hover{transform:translateY(-2px);background:rgba(255,255,255,.10)}
   .choiceCard .ci{font-size:30px;margin-bottom:8px}
   .choiceCard h3{font-family:var(--title);font-optical-sizing:auto;text-transform:uppercase;font-weight:800;letter-spacing:.02em;margin:0 0 5px;font-size:21px;color:#fff}
   .choiceCard p{margin:0 0 13px;font-size:13px;line-height:1.45;color:#c3d2d8;flex:1}
   .choiceCard .go{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
   .choiceCard .tag{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;padding:3px 8px;border-radius:20px;background:rgba(0,0,0,.32);color:#cfe0e6}
-  .choiceCard.ar{border-color:rgba(58,169,196,.5)} .choiceCard.ar .go{color:#7fd3e6}
-  .choiceCard.loc{border-color:rgba(232,162,74,.55)} .choiceCard.loc .go{color:#f2bd72}
+  .choiceCard.ar{border-color:rgba(58,169,196,.3)} .choiceCard.ar .go{color:#7fd3e6}
+  /* ── Featured location hero card ── */
+  .choiceCard.loc{
+    border-color:rgba(0,200,100,.35);
+    background:linear-gradient(135deg,rgba(0,80,40,.55) 0%,rgba(5,25,15,.70) 55%,rgba(15,40,30,.60) 100%);
+    box-shadow:0 0 0 1px rgba(0,200,100,.2),0 18px 40px -16px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);
+    overflow:hidden;
+  }
+  .choiceCard.loc::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 55% at 80% 20%,rgba(0,220,100,.10) 0%,transparent 70%),
+               radial-gradient(ellipse 50% 40% at 10% 80%,rgba(0,160,80,.08) 0%,transparent 60%);
+    pointer-events:none;
+  }
+  .choiceCard.loc>*{position:relative;z-index:1}
+  .choiceCard.loc:hover{background:linear-gradient(135deg,rgba(0,100,50,.6) 0%,rgba(5,30,18,.75) 55%,rgba(15,50,35,.65) 100%);
+    box-shadow:0 0 0 1px rgba(0,230,118,.4),0 22px 50px -18px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);}
+  .choiceCard.loc .go{color:#00e676;font-size:14px;letter-spacing:.1em}
+  .choiceCard.loc h3{font-size:clamp(24px,6vw,34px);margin-bottom:7px;
+    background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,.6));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .choiceCard.loc p{font-size:14px;color:rgba(210,240,225,.75);max-width:42ch;line-height:1.55}
+  .choiceCard.loc .tag{background:rgba(0,60,30,.6);color:#00e676;border:1px solid rgba(0,200,100,.3)}
+  .choiceCard.loc .loc-stats{display:flex;gap:16px;margin-bottom:12px;margin-top:30px}
+  .choiceCard.loc .loc-stat .sv{font-family:var(--mono);font-size:22px;font-weight:700;color:#00e676;line-height:1;display:block}
+  .choiceCard.loc .loc-stat .sl{font-family:var(--mono);font-size:8.5px;letter-spacing:1.5px;color:rgba(180,230,200,.5);text-transform:uppercase;display:block;margin-top:2px}
   .signWrap{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,10,12,.66);backdrop-filter:blur(4px)}
   .signWrap .signCard{width:100%;max-width:420px;background:var(--stage-2);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 26px 64px -22px rgba(0,0,0,.6);animation:rise .22s ease}
   .signCard h3{margin:0 0 4px;font-size:21px;color:var(--tungsten)}
@@ -743,19 +766,23 @@ function renderOnboard(){
         <p class="tagline">Step onto a working film studio and find where carbon, energy and waste hide — on the LED stage and out on location — then decide how to act, AI included.</p>
         <div><span class="signchip ${signedIn?'':'out'}" id="signChip"><span class="dot"></span>${signedIn? esc(st.name)+(st.group?' · '+esc(st.group):'') : 'Sign in to begin'}</span></div>
         <div class="choices2">
+          <button class="choiceCard loc" id="goLoc">
+            <span class="tag">PART 1 · 360° TOUR</span>
+            <div class="loc-stats">
+              <div class="loc-stat"><span class="sv">10</span><span class="sl">Locations</span></div>
+              <div class="loc-stat"><span class="sv">10</span><span class="sl">Decisions</span></div>
+              <div class="loc-stat"><span class="sv">AI</span><span class="sl">Options flagged</span></div>
+            </div>
+            <h3>The Desert Island Film Shoot</h3>
+            <p>Walk ten real 360° locations on a remote tropical production. Make the sustainable call at each point of contact — AI options included.</p>
+            <span class="go">Begin the shoot →</span>
+          </button>
           <button class="choiceCard ar" id="goAR">
-            <span class="tag">PART 1 · AR</span>
+            <span class="tag">PART 2 · AR</span>
             <span class="ci">🎬</span>
             <h3>AR Studio Walks</h3>
             <p>Walk the LED-volume soundstage and work through the eight production departments in augmented reality.</p>
             <span class="go">Enter the studio →</span>
-          </button>
-          <button class="choiceCard loc" id="goLoc">
-            <span class="tag">PART 2 · 360°</span>
-            <span class="ci">🏝️</span>
-            <h3>Desert Island Tour</h3>
-            <p>Walk ten real locations on a remote tropical shoot. Make the sustainable call at each — AI options included. Interactive 360° panoramas.</p>
-            <span class="go">Begin the shoot →</span>
           </button>
         </div>
       </div>
