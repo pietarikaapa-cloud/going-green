@@ -6,7 +6,7 @@
 <title>Going Green — Studio Sustainability Field Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Bodoni+Moda:opsz,wght@6..96,500..900&display=swap" rel="stylesheet">
 <style>
   :root{
     /* Light editorial theme. Green is still earned on the meter. */
@@ -26,6 +26,7 @@
     --radius:14px;
     --mono:"Space Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
     --disp:"Space Grotesk", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+    --title:"Bodoni Moda", "Didot", "Bodoni MT", Georgia, "Times New Roman", serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -91,7 +92,7 @@
   .wrap{max-width:780px; margin:0 auto; padding:22px 18px 130px}
 
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--key)}
-  h1{font-size:clamp(30px,7vw,46px);line-height:.98;margin:.35em 0 .25em;font-weight:700;letter-spacing:-.01em}
+  h1{font-family:var(--title);font-optical-sizing:auto;text-transform:uppercase;font-size:clamp(30px,7vw,46px);line-height:.98;margin:.35em 0 .25em;font-weight:800;letter-spacing:.005em}
   h2{font-size:22px;margin:.2em 0 .5em;font-weight:600;letter-spacing:-.01em}
   p.lede{color:var(--dim);font-size:16px;line-height:1.55;max-width:56ch}
   .small{font-size:13px;color:var(--dim);line-height:1.5}
@@ -129,7 +130,7 @@
 
   .btn{
     appearance:none;border:1px solid var(--line);background:#fff;color:var(--tungsten);
-    border-radius:11px;padding:14px 18px;font-size:15px;font-weight:600;cursor:pointer;
+    border-radius:11px;padding:14px 18px;font-size:14px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;
     display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:transform .08s ease,border-color .2s,background .2s,box-shadow .2s;
     box-shadow:0 1px 3px rgba(60,50,35,.10);
   }
@@ -386,6 +387,51 @@
   .pdLater{position:sticky;bottom:0;display:inline-flex;align-items:center;justify-content:center;width:auto;margin-top:8px;padding:7px 16px;border:none;border-radius:9px;background:#2f9148;color:#fff;font-weight:700;font-size:12.5px;letter-spacing:.2px;cursor:pointer;box-shadow:0 3px 10px rgba(47,145,72,.4)}
   .pdLater:hover{background:#37a755}
   @media(min-width:560px){.gmodal{align-items:center}.gmodal .sheet{border-radius:18px}}
+  /* ---- studio landing ---- */
+  .stage{position:relative;border-radius:20px;overflow:hidden;margin-bottom:16px;padding:24px 22px 26px;
+    background:linear-gradient(180deg,#11181d 0%,#0c1116 58%,#090d11 100%);
+    border:1px solid #20303a;box-shadow:0 18px 46px -22px rgba(0,0,0,.75)}
+  .stage .truss{position:absolute;top:0;left:0;right:0;height:14px;z-index:1;opacity:.85;
+    background:repeating-linear-gradient(90deg,#2b3b45 0 10px,#1b2730 10px 20px)}
+  .stage .spot{position:absolute;width:280px;height:280px;border-radius:50%;filter:blur(46px);opacity:.5;z-index:1;pointer-events:none}
+  .stage .spot.a{top:-96px;left:4%;background:radial-gradient(circle,#e8a24a,transparent 60%)}
+  .stage .spot.b{top:-104px;right:2%;background:radial-gradient(circle,#3aa9c4,transparent 60%)}
+  .stage .ledwall{position:absolute;left:50%;top:38px;transform:translateX(-50%);z-index:1;
+    width:min(560px,88%);height:120px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(180deg,#bfe2ef 0%,#86c8dd 42%,#f3d9a6 72%,#e7b573 100%);
+    box-shadow:0 0 64px -8px rgba(120,200,230,.45),inset 0 0 30px rgba(0,0,0,.22)}
+  .stage .ledwall::after{content:"";position:absolute;inset:0;opacity:.5;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 2px,transparent 2px 4px),repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 3px,transparent 3px 6px)}
+  .stage .ledsun{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle,#fff6de,#ffd98a 62%,transparent);box-shadow:0 0 28px #ffdf97}
+  .stage .floor{position:absolute;left:0;right:0;bottom:0;height:120px;z-index:1;border-top:1px solid rgba(120,170,190,.12);
+    background:linear-gradient(180deg,transparent,rgba(60,90,110,.16) 36%,transparent)}
+  .stage .scontent{position:relative;z-index:2;text-align:center;padding-top:138px}
+  .stage .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#9fd3c2}
+  .stage h1{font-family:var(--title);font-optical-sizing:auto;text-transform:uppercase;font-weight:900;letter-spacing:.01em;color:#fff;font-size:clamp(34px,8.4vw,58px);margin:.06em 0 .12em;text-shadow:0 2px 22px rgba(0,0,0,.55)}
+  .stage .tagline{color:#c3d2d8;max-width:50ch;font-size:14.5px;line-height:1.55;margin:0 auto}
+  .signchip{display:inline-flex;align-items:center;gap:8px;margin:14px auto 0;cursor:pointer;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#e8f0f2;border-radius:30px;padding:7px 14px;font-size:13px;font-weight:600}
+  .signchip:hover{background:rgba(255,255,255,.14)}
+  .signchip .dot{width:8px;height:8px;border-radius:50%;background:#6fcf73;box-shadow:0 0 8px #6fcf73}
+  .signchip.out .dot{background:#e0a04a;box-shadow:0 0 8px #e0a04a}
+  .choices2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;text-align:left}
+  @media(max-width:560px){.choices2{grid-template-columns:1fr}}
+  .choiceCard{position:relative;display:flex;flex-direction:column;align-items:flex-start;border-radius:16px;padding:18px 18px 16px;cursor:pointer;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;
+    transition:transform .1s ease,border-color .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .choiceCard:hover{transform:translateY(-2px);background:rgba(255,255,255,.11)}
+  .choiceCard .ci{font-size:30px;margin-bottom:8px}
+  .choiceCard h3{font-family:var(--title);font-optical-sizing:auto;text-transform:uppercase;font-weight:800;letter-spacing:.02em;margin:0 0 5px;font-size:21px;color:#fff}
+  .choiceCard p{margin:0 0 13px;font-size:13px;line-height:1.45;color:#c3d2d8;flex:1}
+  .choiceCard .go{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+  .choiceCard .tag{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;padding:3px 8px;border-radius:20px;background:rgba(0,0,0,.32);color:#cfe0e6}
+  .choiceCard.ar{border-color:rgba(58,169,196,.5)} .choiceCard.ar .go{color:#7fd3e6}
+  .choiceCard.loc{border-color:rgba(232,162,74,.55)} .choiceCard.loc .go{color:#f2bd72}
+  .signWrap{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,10,12,.66);backdrop-filter:blur(4px)}
+  .signWrap .signCard{width:100%;max-width:420px;background:var(--stage-2);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 26px 64px -22px rgba(0,0,0,.6);animation:rise .22s ease}
+  .signCard h3{margin:0 0 4px;font-size:21px;color:var(--tungsten)}
+  .signCard .sub{margin:0 0 6px;color:var(--dim);font-size:13.5px;line-height:1.5}
   .hide{display:none !important}
   @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
 </style>
@@ -685,57 +731,67 @@ function render(){
 /* ---- 9. SCREENS ------------------------------------------------------ */
 function renderOnboard(){
   const st=S.student||{};
+  const signedIn=!!(S.student&&S.student.name);
   screen.innerHTML=`
-    <div class="hero">
-      <div class="gels"><i style="background:#cd7a26"></i><i style="background:#2c8ea0"></i><i style="background:#3aa256"></i><i style="background:#9b8cff"></i></div>
-      <span class="eyebrow">Studio sustainability field tool</span>
-      <h1>Going&nbsp;Green</h1>
-      <p class="tagline">Explore a media production studio and uncover where carbon, energy and waste hide — then decide how to address it, including where AI helps and where it doesn't.</p>
-    </div>
-    <div class="panel" style="margin-top:16px">
-      <h4>Step 1 — sign in</h4>
-      <div class="field">
-        <label class="lab" for="nm">Your name</label>
-        <input id="nm" type="text" autocomplete="name" placeholder="e.g. Alex Chan" value="${esc(st.name||"")}">
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label class="lab" for="sid">Student ID</label>
-          <input id="sid" type="text" placeholder="e.g. u2401234" value="${esc(st.id||"")}">
+    <div class="stage">
+      <div class="truss"></div><div class="spot a"></div><div class="spot b"></div>
+      <div class="ledwall"><div class="ledsun"></div></div>
+      <div class="floor"></div>
+      <div class="scontent">
+        <span class="eyebrow">Studio sustainability field tool</span>
+        <h1>Going&nbsp;Green</h1>
+        <p class="tagline">Step onto a working film studio and find where carbon, energy and waste hide — on the LED stage and out on location — then decide how to act, AI included.</p>
+        <div><span class="signchip ${signedIn?'':'out'}" id="signChip"><span class="dot"></span>${signedIn? esc(st.name)+(st.group?' · '+esc(st.group):'') : 'Sign in to begin'}</span></div>
+        <div class="choices2">
+          <button class="choiceCard ar" id="goAR">
+            <span class="tag">PART 1 · AR</span>
+            <span class="ci">🎬</span>
+            <h3>AR Studio Walks</h3>
+            <p>Walk the LED-volume soundstage and work through the eight production departments in augmented reality.</p>
+            <span class="go">Enter the studio →</span>
+          </button>
+          <button class="choiceCard loc" id="goLoc">
+            <span class="tag">PART 2 · 360°</span>
+            <span class="ci">🏝️</span>
+            <h3>Desert Island Tour</h3>
+            <p>Walk ten real locations on a remote tropical shoot. Make the sustainable call at each — AI options included. Interactive 360° panoramas.</p>
+            <span class="go">Begin the shoot →</span>
+          </button>
         </div>
-        <div class="field">
-          <label class="lab" for="grp">Group / module</label>
-          <input id="grp" type="text" placeholder="e.g. MA Media B" value="${esc(st.group||"")}">
-        </div>
-      </div>
-      <p class="small" style="margin:2px 0 0">${GOOGLE_ENDPOINT?"Results submit to your class's central sheet at the end.":"Offline mode — you'll export your own results file at the end."}</p>
-    </div>
-    <h4 style="margin:20px 2px 8px">Step 2 — choose how to take part</h4>
-    <div class="routes">
-      <div class="route primary">
-        <span class="rtag">RECOMMENDED</span>
-        <h3>1 · Take the virtual studio walk</h3>
-        <p>Explore the shoot in <b>3D</b>: walk the island, visit all <b>10 set locations</b> and make the greener call at each — a floor manager shows you the controls when you arrive, and your carbon meter falls as you go. Works on phone, tablet or laptop.</p>
-        <button class="btn key block" id="goWalk">▶ Start the virtual walk</button>
-      </div>
-      <div class="route">
-        <span class="rtag alt">NO 3D NEEDED</span>
-        <h3>2 · Or take the test via the menu</h3>
-        <p>Prefer something lighter? Work through the <b>eight production stations</b> as a simple menu (or point your camera in <b>AR</b>) and complete the task at each one. Same questions, no 3D required.</p>
-        <button class="btn block" id="goMenu">Open the 8-set menu →</button>
       </div>
     </div>
     ${setupBlock()}
+    <div class="signWrap hide" id="signWrap">
+      <div class="signCard">
+        <h3>Sign in</h3>
+        <p class="sub">Just your name to begin — Student ID and group are optional, for your tutor's records.</p>
+        <div class="field"><label class="lab" for="nm">Your name</label><input id="nm" type="text" autocomplete="name" placeholder="e.g. Alex Chan" value="${esc(st.name||'')}"></div>
+        <div class="row2">
+          <div class="field" style="margin:0"><label class="lab" for="sid">Student ID <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="sid" type="text" placeholder="u2401234" value="${esc(st.id||'')}"></div>
+          <div class="field" style="margin:0"><label class="lab" for="grp">Group <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="grp" type="text" placeholder="MA Media B" value="${esc(st.group||'')}"></div>
+        </div>
+        <button class="btn primary block" id="signGo" style="margin-top:16px">Continue ▸</button>
+      </div>
+    </div>
   `;
+  dock.classList.add("hide");
+  const wrap=$("#signWrap"); let pendingRoute=null;
+  const openSign=(route)=>{ pendingRoute=route; wrap.classList.remove("hide"); setTimeout(()=>{ const n=$("#nm"); if(n) n.focus(); },60); };
+  const closeSign=()=>wrap.classList.add("hide");
   const capture=()=>{ const name=$("#nm").value.trim();
-    if(!name){ toast("Add your name first",true); $("#nm").focus(); try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){} return false; }
-    S.student={ name, id:$("#sid").value.trim(), group:$("#grp").value.trim() }; if(!S.started) S.started=Date.now(); return true; };
-  dock.classList.remove("hide");
-  dock.innerHTML=`<span class="grow" style="font-family:var(--mono);font-size:12px;color:var(--dim)">Enter your name, then pick a route ↑</span>`;
-  $("#goWalk").onclick=()=>{ if(!capture()) return;
-    S.game={ choices:Array(LOCATION_GAME.markers.length).fill(null), finished:false, done:false, score:(S.game&&S.game.done?S.game.score:0), avatar:(S.game&&S.game.avatar)||null };
-    S.route="game"; save(); render(); };
-  $("#goMenu").onclick=()=>{ if(!capture()) return; S.route="hub"; save(); render(); };
+    if(!name){ toast("Add your name first",true); $("#nm").focus(); return false; }
+    S.student={ name, id:$("#sid").value.trim(), group:$("#grp").value.trim() }; if(!S.started) S.started=Date.now(); save(); return true; };
+  const goRoute=(r)=>{
+    if(r==="hub"){ S.route="hub"; S.view="ar"; }
+    else if(r==="game"){ S.game={ choices:Array(LOCATION_GAME.markers.length).fill(null), finished:false, done:false, score:(S.game&&S.game.done?S.game.score:0), avatar:(S.game&&S.game.avatar)||null }; S.route="game"; }
+    save(); render(); };
+  const enter=(r)=>{ if(S.student&&S.student.name) goRoute(r); else openSign(r); };
+  $("#goAR").onclick=()=>enter("hub");
+  $("#goLoc").onclick=()=>{ window.location.href='desert-island-tour-v2.html'; };
+  $("#signChip").onclick=()=>openSign(null);
+  $("#signGo").onclick=()=>{ if(!capture()) return; closeSign(); if(pendingRoute) goRoute(pendingRoute); else render(); };
+  wrap.onclick=(e)=>{ if(e.target===wrap) closeSign(); };
+  $("#nm").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); $("#signGo").click(); } });
 }
 
 function renderHub(){
@@ -928,9 +984,9 @@ const AVATARS=[
 ];
 /* where each point of contact physically sits in the virtual island (world 1000x680) */
 const MARK_POS=[
-  {x:370,y:500,icon:"🔭"},{x:215,y:470,icon:"✈️"},{x:210,y:300,icon:"📦"},{x:330,y:185,icon:"⚡"},
-  {x:510,y:165,icon:"🏠"},{x:690,y:185,icon:"🛏️"},{x:820,y:310,icon:"🍽️"},{x:825,y:455,icon:"🌊"},
-  {x:650,y:490,icon:"💡"},{x:745,y:555,icon:"📡"}
+  {x:255,y:175,icon:"🔭"},{x:215,y:470,icon:"✈️"},{x:360,y:545,icon:"📦"},{x:795,y:300,icon:"⚡"},
+  {x:500,y:330,icon:"🏠"},{x:255,y:360,icon:"🛏️"},{x:700,y:520,icon:"🍽️"},{x:905,y:415,icon:"🌊"},
+  {x:610,y:245,icon:"💡"},{x:770,y:165,icon:"📡"}
 ];
 const ISLAND={cx:500,cy:360,rx:432,ry:292};
 const PORTAL={x:825,y:560,icon:"🎬"};            // island → studio
@@ -1117,8 +1173,8 @@ function renderWorld(){
     {button:"See my report ▸", onClose:()=>{ S.game.finished=true; stopWorld(); save(); render(); }}); };
   function camLabel(){ const b=$("#wCam"); if(b) b.textContent=(world&&world.cam==="follow")?"📹 Follow":"👁 First-person"; }
   $("#wCam").onclick=()=>{ if(!world) return; world.cam=world.cam==="follow"?"fp":"follow"; S.game.cam=world.cam; save(); camLabel(); };
-  { const zi=$("#zoomIn"), zo=$("#zoomOut"); const setZoom=d=>{ if(!world) return; world.zoom=Math.round(Math.max(0.7,Math.min(3,(world.zoom||1)+d))*100)/100; S.game.zoom=world.zoom; save(); if(typeof toast==="function") toast("Camera "+(d<0?"closer":"further")+" · "+world.zoom.toFixed(2)+"×"); };
-    if(zi) zi.onclick=()=>setZoom(-0.25); if(zo) zo.onclick=()=>setZoom(0.25); }
+  { const zi=$("#zoomIn"), zo=$("#zoomOut"); const setZoom=d=>{ if(!world) return; world.zoom=Math.round(Math.max(0.7,Math.min(6,(world.zoom||1)+d))*100)/100; S.game.zoom=world.zoom; save(); if(typeof toast==="function") toast("Camera "+(d<0?"closer":"further")+" · "+world.zoom.toFixed(2)+"×"); };
+    if(zi) zi.onclick=()=>setZoom(-0.5); if(zo) zo.onclick=()=>setZoom(0.5); }
   { const gb=$("#guideBtn"); if(gb) gb.onclick=showGuide; }
   { const lmList=$("#lmList"), locMenu=$("#locMenu"), locBtn=$("#locBtn");
     if(lmList){ lmList.innerHTML=MARKER_NAME.map((n,i)=>`<button class="lmItem" data-i="${i}"><span>${i+1}. ${esc(n)}</span><span class="ck" data-ck="${i}"></span></button>`).join("")
@@ -1294,10 +1350,7 @@ function initWorld3D(av){
   const ARR={ x:0, edgeZ:IA.z-0.5, endZ:IA.z+13, hw:2.9 };          // arrival jetty corridor (south, over water)
   // main spine: arrival dock → base camp, then tidy branches out to each set
   islandG.add(ribbonMesh([{x:0,z:IA.z+1},{x:0,z:IA.z*0.6},{x:0,z:IA.z*0.28},{x:0,z:0}],4.6,false));
-  // sequential story trail: base camp → each location in M01→M10 order → studio gate
-  { const stops=[{x:500,y:340}].concat(MARK_POS.map(mp=>({x:mp.x,y:mp.y}))).concat([{x:PORTAL.x,y:PORTAL.y}]);
-    for(let s=0;s<stops.length-1;s++){ const a=to3(stops[s].x,stops[s].y), b=to3(stops[s+1].x,stops[s+1].y);
-      islandG.add(ribbonMesh(windy(a.x,a.z,b.x,b.z),2.6,false)); } }
+  MARK_POS.forEach(mp=>{ const q=to3(mp.x,mp.y); islandG.add(ribbonMesh(windy(hub.x,hub.z,q.x,q.z),2.6,false)); });
   const clearing=new T.Mesh(new T.CircleGeometry(7.5,30),Mpath); clearing.rotation.x=-Math.PI/2; clearing.position.set(hub.x,0.025,hub.z); clearing.receiveShadow=true; islandG.add(clearing);
   // coastal boardwalk (raised planks, closed loop just inside the shore)
   const Mwood=new T.MeshStandardMaterial({map:texPlank(),roughness:0.85});
@@ -1519,6 +1572,7 @@ function initWorld3D(av){
     const f=fwdVec(), head=player.pos.clone().add(_tmp.set(0,2.3,0));
     if(world.cam==="follow"){ const z=world.zoom||1; const want=player.pos.clone().addScaledVector(f,-14*z).add(new T.Vector3(0,8.5*z,0)); camera.position.lerp(want,0.18); camera.lookAt(head.clone().addScaledVector(f,3.5)); }
     else { camera.position.copy(head); camera.lookAt(head.clone().addScaledVector(f,6)); }
+    { const wantFov=Math.max(58,Math.min(96,62+((world.zoom||1)-1)*10)); if(Math.abs(camera.fov-wantFov)>0.05){ camera.fov=wantFov; camera.updateProjectionMatrix(); } }
     oPrompt.style.display="none"; let best=-1,bestd=1e9;
     let nextI=-1; for(let n=0;n<S.game.choices.length;n++){ if(S.game.choices[n]==null){ nextI=n; break; } }
     markers.forEach(mk=>{
@@ -1572,11 +1626,14 @@ function renderWorld2D(){
   $("#wFinish").onclick=()=>{ S.game.finished=true; stopWorld(); save(); render(); };
   function camLabel(){ $("#wCam").textContent = world.cam==="follow" ? "📹 Follow-cam" : "👁 First-person"; }
   $("#wCam").onclick=()=>{ if(!world) return; world.cam = world.cam==="follow"?"fp":"follow"; S.game.cam=world.cam; save(); camLabel(); };
-  function setFov2d(d){ FOV=Math.round(Math.max(1.0,Math.min(1.95,FOV+d))*100)/100; CULL=FOV/2+0.4; S.game.fov2d=FOV; save(); if(typeof fit==="function") fit(); if(typeof toast==="function") toast("View "+(d>0?"wider":"closer")); }
-  { const zo=$("#zOut"), zi=$("#zIn"); if(zo) zo.onclick=()=>setFov2d(0.16); if(zi) zi.onclick=()=>setFov2d(-0.16); }
+  function setZoom2d(out){ world.back2d=Math.round(Math.max(150,Math.min(950,(world.back2d||S.game.back2d||360)+(out?120:-120))));
+    FOV=Math.round(Math.max(1.0,Math.min(2.2,FOV+(out?0.10:-0.10)))*100)/100; CULL=FOV/2+0.4;
+    S.game.back2d=world.back2d; S.game.fov2d=FOV; save(); if(typeof fit==="function") fit();
+    if(typeof toast==="function") toast((out?"Pulled back":"Closer")+" · dist "+world.back2d); }
+  { const zo=$("#zOut"), zi=$("#zIn"); if(zo) zo.onclick=()=>setZoom2d(true); if(zi) zi.onclick=()=>setZoom2d(false); }
 
   const cv=$("#gcanvas"), ctx=cv.getContext("2d");
-  let FOV=(S.game.fov2d||1.42), CULL=FOV/2+0.4; const CAMH=42;
+  let FOV=1.5, CULL=FOV/2+0.4; const CAMH=42;
   const player={ x:PORTAL.x-120, y:PORTAL.y-150, a:-Math.PI/2, bob:0, moving:false };
   // face island centre on spawn
   player.a=Math.atan2(ISLAND.cy-player.y, ISLAND.cx-player.x);
@@ -1720,7 +1777,7 @@ function renderWorld2D(){
     // camera: first-person (POV) or follow-cam (trailing the visible avatar)
     const follow=world.cam==="follow";
     const fxh=Math.cos(player.a), fyh=Math.sin(player.a), rxh=Math.cos(player.a+Math.PI/2), ryh=Math.sin(player.a+Math.PI/2);
-    const BACK=180, SIDE=22, camA=player.a;
+    const BACK=(world.back2d||180), SIDE=22, camA=player.a;
     const camX=follow? player.x-fxh*BACK+rxh*SIDE : player.x;
     const camY=follow? player.y-fyh*BACK+ryh*SIDE : player.y;
     const camH=follow? 74 : CAMH;
